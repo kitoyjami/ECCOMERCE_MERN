@@ -11,11 +11,12 @@ const createUser = async (req,res) =>{
     }else {
         res.json(
             {
-                msg:"User already exists",
+                msg:"User already exists ",
                 success:false
             }
         )
     }
 }
+
 
 module.exports = {createUser}
