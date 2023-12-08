@@ -79,10 +79,11 @@ const deleteaUser= asyncHandler(async (req,res)=>{
 })
 
 const updateaUser= asyncHandler(async (req,res)=>{
-    const {id} =req.params
+    console.log=req.params
+    const {_id} =req.params
     try {
         
-        const updateaUser=await User.findByIdAndUpdate(id,{
+        const updateaUser=await User.findByIdAndUpdate(_id,{
             firstname: req?.body?.firstname,
             lasttname: req?.body?.lasttname,
             email:  req?.body?.email,

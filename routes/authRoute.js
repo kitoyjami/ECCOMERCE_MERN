@@ -4,13 +4,13 @@ const router = express.Router()
 
 createUser
 
-const {authMiddleware}=require("../middlewares/authMiddleware")
+const {authMiddleware, isAdmin}=require("../middlewares/authMiddleware")
 
 router.post("/register",createUser)
 router.post("/login",loginUserCtlr)
 router.get("/users",getAllUser)
-router.get("/:id",authMiddleware,getaUser)
+router.get("/:id",authMiddleware,isAdmin,getaUser)
 router.delete("/:id",deleteaUser)
-router.put("/:id",updateaUser)
+router.put("/edit",authMiddleware,updateaUser)
 
 module.exports=router
