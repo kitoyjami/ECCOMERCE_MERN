@@ -3,6 +3,7 @@ const User=require("../models/userModel")
 const asyncHandler=require('express-async-handler')
 const validateMongoDbId =require("../utils/validateMongodbid")
 const {generateRefreshToken} =require("../config/refreshtoken")
+const jwt=require("jsonwebtoken")
 
 const createUser =asyncHandler(async (req,res) => {
 
@@ -56,6 +57,21 @@ const loginUserCtlr=asyncHandler(async (req,res)=> {
 const handleRefreshTOken =asyncHandler (async (req,res) =>{
     const cookie=req.cookies
     console.log(cookie)
+    if(!cookie?.refreshToken) throw new Error ("No Refresh token in cookies")
+    const refreshToken =cookie.refreshToken
+    console.log(refreshToken)
+    const user= await User.findOne({refreshToken})
+    if(!user) throw new Error('No refresh token present in db')
+    jwt.verify(refreshToken,process.env.JWT_SECRET,(err,decoded)=>{
+        if(err || user.id !==decoded.id){
+            throw new Error('There is something wrong with refresh token')
+        }
+        const accessToken= generateToken(user?._id)
+        res.json({accessToken})
+    })
+
+
+    
 })
 
 // GET ALL USERS
