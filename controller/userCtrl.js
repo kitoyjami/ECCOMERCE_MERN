@@ -1,7 +1,7 @@
 const { generateToken } = require("../config/jwtToken")
 const User=require("../models/userModel")
 const asyncHandler=require('express-async-handler')
-
+const validateMongoDbId =require("../utils/validateMongodbid")
 
 const createUser =asyncHandler(async (req,res) => {
 
@@ -79,8 +79,8 @@ const deleteaUser= asyncHandler(async (req,res)=>{
 })
 
 const updateaUser= asyncHandler(async (req,res)=>{
-    console.log=req.params
-    const {_id} =req.params
+    
+    const {_id} =req.user
     try {
         
         const updateaUser=await User.findByIdAndUpdate(_id,{
@@ -101,5 +101,39 @@ const updateaUser= asyncHandler(async (req,res)=>{
     }
 })
 
+const blockUser = asyncHandler (async (req,res) =>{
+    const {id}=req.params
+    try{
+        const block= await User.findByIdAndUpdate(id,{isBLocked: true
+        }, {new : true})
+        res.json(
+            {
+                msg: "User blocked"
+            }
+        )
+    }catch(error){
+        throw new Error(error)
+    }
 
-module.exports = {createUser,loginUserCtlr,getAllUser,getaUser,deleteaUser,updateaUser}
+
+})
+
+const unblockUser = asyncHandler (async (req,res) =>{
+    const {id}=req.params
+    try{
+        const block=await User.findByIdAndUpdate(id,{isBLocked: false
+        }, {new : true})
+    }catch(error){
+        throw new Error(error)
+    }
+    res.json(
+        {
+            msg: "User Unblocked"
+        }
+    )
+})
+
+
+module.exports = {createUser,loginUserCtlr,
+    getAllUser,getaUser,deleteaUser,updateaUser,
+blockUser,unblockUser}

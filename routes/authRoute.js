@@ -1,5 +1,5 @@
 const express = require('express')
-const { createUser, loginUserCtlr, getAllUser, getaUser, deleteaUser, updateaUser } = require('../controller/userCtrl')
+const { createUser, loginUserCtlr, getAllUser, getaUser, deleteaUser, updateaUser, blockUser, unblockUser } = require('../controller/userCtrl')
 const router = express.Router()
 
 createUser
@@ -12,5 +12,8 @@ router.get("/users",getAllUser)
 router.get("/:id",authMiddleware,isAdmin,getaUser)
 router.delete("/:id",deleteaUser)
 router.put("/edit",authMiddleware,updateaUser)
+
+router.put("/block-user/:id",authMiddleware,isAdmin,blockUser)
+router.put("/unblock-user/:id",authMiddleware,isAdmin,unblockUser)
 
 module.exports=router
