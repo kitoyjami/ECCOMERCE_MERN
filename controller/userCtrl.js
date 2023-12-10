@@ -70,8 +70,33 @@ const handleRefreshTOken =asyncHandler (async (req,res) =>{
         res.json({accessToken})
     })
 
-
     
+})
+
+// logout functionality
+
+const logout = asyncHandler (async (req,res)=>{
+    const cookie =req.cookies
+    if(!cookie?.refreshToken) throw new Error ("No Refresh token in cookies")
+    const refreshToken =cookie.refreshToken
+    const user = await User.findOne({refreshToken})
+    if(!user){
+        res.clearCookie('refreshToken', {
+            httpOnly:true,
+            secure:true, 
+        })
+        return res.sendStatus(204) //forbidden
+    }
+    await User.findOneAndUpdate({refreshToken},{
+        refreshToken:""
+    })
+    res.clearCookie('refreshToken', {
+        httpOnly:true,
+        secure:true, 
+    })
+    return res.sendStatus(204) //forbidden
+    
+
 })
 
 // GET ALL USERS
@@ -176,4 +201,4 @@ const unblockUser = asyncHandler (async (req,res) =>{
 module.exports = {createUser,loginUserCtlr,
     getAllUser,getaUser,deleteaUser,updateaUser,
 blockUser,unblockUser,
-handleRefreshTOken}
+handleRefreshTOken,logout}

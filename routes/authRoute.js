@@ -1,5 +1,5 @@
 const express = require('express')
-const { createUser, loginUserCtlr, getAllUser, getaUser, deleteaUser, updateaUser, blockUser, unblockUser, handleRefreshTOken } = require('../controller/userCtrl')
+const { createUser, loginUserCtlr, getAllUser, getaUser, deleteaUser, updateaUser, blockUser, unblockUser, handleRefreshTOken, logout } = require('../controller/userCtrl')
 const router = express.Router()
 
 createUser
@@ -10,6 +10,7 @@ router.post("/register",createUser)
 router.post("/login",loginUserCtlr)
 router.get("/users",getAllUser)
 router.get("/refresh",handleRefreshTOken)
+router.get("/logout",logout)
 router.get("/:id",authMiddleware,isAdmin,getaUser)
 router.delete("/:id",deleteaUser)
 router.put("/edit",authMiddleware,updateaUser)
