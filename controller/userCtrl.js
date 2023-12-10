@@ -2,6 +2,7 @@ const { generateToken } = require("../config/jwtToken")
 const User=require("../models/userModel")
 const asyncHandler=require('express-async-handler')
 const validateMongoDbId =require("../utils/validateMongodbid")
+const {generateRefreshToken} =require("../config/refreshtoken")
 
 const createUser =asyncHandler(async (req,res) => {
 
@@ -14,10 +15,6 @@ const createUser =asyncHandler(async (req,res) => {
     }else {
         throw new Error ('User Already Exist')
     }
-
-
-
-
 })
 
 const loginUserCtlr=asyncHandler(async (req,res)=> {
@@ -26,6 +23,20 @@ const loginUserCtlr=asyncHandler(async (req,res)=> {
     const findUser=await User.findOne({email})
     if(findUser && await findUser.isPasswordMatched(password))
     {
+        const refreshToken=await generateRefreshToken(findUser?._id)
+        const updateuser=await User.findByIdAndUpdate(
+            findUser.id,
+            {
+            refreshToken:refreshToken
+            },
+            {new:true}
+        )
+        
+        res.cookie('refreshToken', refreshToken,{
+            httpOnly:true,
+            maxAge: 72*60*60*1000,
+        }) 
+
         res.json({
             _id : findUser?.id,
             firstname: findUser?.firstname,
@@ -38,6 +49,13 @@ const loginUserCtlr=asyncHandler(async (req,res)=> {
     }else {
         throw new Error("Invalid Crendential")
     }
+})
+
+//handle refresh token
+
+const handleRefreshTOken =asyncHandler (async (req,res) =>{
+    const cookie=req.cookies
+    console.log(cookie)
 })
 
 // GET ALL USERS
@@ -54,6 +72,7 @@ const getAllUser= asyncHandler(async (req,res)=>{
 
 const getaUser= asyncHandler(async (req,res)=>{
     const {id} =req.params
+    validateMongoDbId(id)
     try {
         
         const getaUser=await User.findById(id)
@@ -67,6 +86,7 @@ const getaUser= asyncHandler(async (req,res)=>{
 
 const deleteaUser= asyncHandler(async (req,res)=>{
     const {id} =req.params
+    validateMongoDbId(id)
     try {
         
         const deleteaUser=await User.findByIdAndDelete(id)
@@ -81,6 +101,7 @@ const deleteaUser= asyncHandler(async (req,res)=>{
 const updateaUser= asyncHandler(async (req,res)=>{
     
     const {_id} =req.user
+    validateMongoDbId(_id)
     try {
         
         const updateaUser=await User.findByIdAndUpdate(_id,{
@@ -103,6 +124,7 @@ const updateaUser= asyncHandler(async (req,res)=>{
 
 const blockUser = asyncHandler (async (req,res) =>{
     const {id}=req.params
+    validateMongoDbId(id)
     try{
         const block= await User.findByIdAndUpdate(id,{isBLocked: true
         }, {new : true})
@@ -120,6 +142,7 @@ const blockUser = asyncHandler (async (req,res) =>{
 
 const unblockUser = asyncHandler (async (req,res) =>{
     const {id}=req.params
+    validateMongoDbId(id)
     try{
         const block=await User.findByIdAndUpdate(id,{isBLocked: false
         }, {new : true})
@@ -136,4 +159,5 @@ const unblockUser = asyncHandler (async (req,res) =>{
 
 module.exports = {createUser,loginUserCtlr,
     getAllUser,getaUser,deleteaUser,updateaUser,
-blockUser,unblockUser}
+blockUser,unblockUser,
+handleRefreshTOken}
