@@ -11,12 +11,17 @@ const bodyParser = require('body-parser')
 const { notFound, errorHandler } = require('./middlewares/erroHandler')
 const cookieParser =require("cookie-parser")
 
-app.use((req, res, next) => {
-    res.append('Access-Control-Allow-Origin', ['*']);
-    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.append("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    next();
-});
+const cors = require("cors")
+
+const corsOptions = {
+    origin: ['http://localhost'],
+    allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Methods", "Access-Control-Request-Headers"],
+    credentials: true,
+    enablePreflight: true
+}
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions))
 
 dbConnect()
 
