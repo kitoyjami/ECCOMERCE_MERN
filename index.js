@@ -1,3 +1,4 @@
+
 const express=require('express')
 const dbConnect = require('./config/dbConnect')
 const app =express()
@@ -10,8 +11,11 @@ const bodyParser = require('body-parser')
 const { notFound, errorHandler } = require('./middlewares/erroHandler')
 const cookieParser =require("cookie-parser")
 
+const cors = require("cors")
 
 dbConnect()
+
+app.use(cors())
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:false}))
