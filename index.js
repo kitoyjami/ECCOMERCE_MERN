@@ -11,11 +11,14 @@ const bodyParser = require('body-parser')
 const { notFound, errorHandler } = require('./middlewares/erroHandler')
 const cookieParser =require("cookie-parser")
 
-const cors = require("cors")
 
-app.use(cors())
 dbConnect()
 
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    next();
+});
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:false}))
