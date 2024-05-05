@@ -20,11 +20,11 @@ const corsOptions = {
     enablePreflight: true
 }
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions))
 
 dbConnect()
 
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:false}))
