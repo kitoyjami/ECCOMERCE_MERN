@@ -13,18 +13,11 @@ const cookieParser =require("cookie-parser")
 
 const cors = require("cors")
 
-const corsOptions = {
-    origin: ['http://localhost'],
-    allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Methods", "Access-Control-Request-Headers"],
-    credentials: true,
-    enablePreflight: true
-}
-
 
 dbConnect()
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions))
+app.use(cors());
+app.options('*', cors())
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:false}))
