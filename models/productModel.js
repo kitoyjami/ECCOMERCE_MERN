@@ -1,4 +1,4 @@
-const mongoose =require ("mongoose")
+const mongoose =require ('mongoose')
 
 var productSchema = new mongoose.Schema({
     title:{
@@ -21,20 +21,23 @@ var productSchema = new mongoose.Schema({
         require:true
     },
     category:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"Category",
+        type:String,
+        required:true,
     },
 
     brand:{
         type:String,
-        enum:['Apple','Samsung','Lenovo']
+        required:true,
     },
-
-    quantity: Number,
+    
+    quantity: {
+        type:Number,
+        require: true,
+        selection:false,
+    },
     sold:{
         type:Number,
         default:0,
-
     },
     images:{
         type: Array,
@@ -42,7 +45,7 @@ var productSchema = new mongoose.Schema({
     },
     color:{
         type:String,
-        enum:['Black','Brown','Red']
+        required:true,
     },
     ratings:[{star:Number,
         postedby:{type:mongoose.Schema.Types.ObjectId,ref:"User"}
@@ -52,4 +55,4 @@ var productSchema = new mongoose.Schema({
 
 },{timestamps:true})
 
-module.exports= mongoose.model("Product",productSchema)
+module.exports= mongoose.model('Product',productSchema)
