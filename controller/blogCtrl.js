@@ -70,26 +70,23 @@ const likeBlog =asyncHandler(async (req,res)=>{
     validateMongoDbId(blogId)
     // Find the blog which you want to be liked
     const blog =await Blog.findById(blogId)
-
+    console.log("hola 1 ",blogId)
     //Find the login user
-    const loginUserId = req?.user?._id
-
+    const loginUserId = req.user._id
+    console.log("hola 2 ",loginUserId)
     // find if the user has liked the blog
-    const isLiked1= blog?.isLiked
+    const isLiked1= blog.isLiked
     // find if the user has disliked the blog
-    const alreadyDisliked=blog?.dislikes?.find(
-        (userId)=> {
-            userId?.toString() === loginUserId?.toString()
-        }
-    )
-    console.log("hola 1 ",alreadyDisliked)
 
-    if(alreadyDisliked){
+    const bandera=[...blog.dislikes]
+    const bandera2=loginUserId
+    const estado=bandera.find((hola)=>hola.toString()==bandera2)!== undefined
+
+   if(estado){
         const blog =await Blog.findByIdAndUpdate(blogId,{
             $pull:{dislikes:loginUserId},
             isDisliked:false
         },{new:true})
-        console.log(alreadyDisliked)
         res.json(blog)
     }
     if(isLiked1){
@@ -98,7 +95,6 @@ const likeBlog =asyncHandler(async (req,res)=>{
             isLiked:false
         },{new:true})
         res.json(blog)
-        console.log(isLiked1)
     }
     else{
         const blog =await Blog.findByIdAndUpdate(blogId,{
@@ -106,7 +102,7 @@ const likeBlog =asyncHandler(async (req,res)=>{
             isLiked:true
         },{new:true})
         res.json(blog)
-    }
+    } 
 })
 
 const dislikeBlog =asyncHandler(async (req,res)=>{
@@ -116,24 +112,20 @@ const dislikeBlog =asyncHandler(async (req,res)=>{
     const blog =await Blog.findById(blogId)
 
     //Find the login user
-    const loginUserId = req?.user?._id
+    const loginUserId = req.user._id
 
     // find if the user has liked the blog
     const isDisLiked1= blog?.isDisliked
     // find if the user has disliked the blog
-    const alreadyLiked=blog?.likes?.find(
-        (userId)=> {
-            userId?.toString() === loginUserId?.toString()
-        }
-    )
-    console.log("hola 1 ",alreadyLiked)
+    const bandera=[...blog.likes]
+    const bandera2=loginUserId
+    const estado=bandera.find((hola)=>hola.toString()==bandera2)!== undefined
 
-    if(alreadyLiked){
+    if(estado){
         const blog =await Blog.findByIdAndUpdate(blogId,{
             $pull:{likes:loginUserId},
             isLiked:false
         },{new:true})
-        console.log(alreadyLiked)
         res.json(blog)
     }
     if(isDisLiked1){
@@ -142,7 +134,6 @@ const dislikeBlog =asyncHandler(async (req,res)=>{
             isDisliked:false
         },{new:true})
         res.json(blog)
-        console.log(isLiked1)
     }
     else{
         const blog =await Blog.findByIdAndUpdate(blogId,{
