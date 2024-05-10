@@ -17,7 +17,7 @@ router.put('/upload/:id',
 authMiddleware,
 uploadPhoto.array('images',10),
 productImgResize,
-uploadImages
+uploadImages,
 )
 
 router.get('/:id',getaProduct)
