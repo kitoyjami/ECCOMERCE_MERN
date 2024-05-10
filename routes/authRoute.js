@@ -13,7 +13,12 @@ const { createUser, loginUserCtlr,
     resetPassword,
     getWishList,
     saveAddress,
-    userCart} 
+    userCart,
+    getUserCart,
+    emptyCart,
+    applyCoupon,
+    createOrder,
+    getOrder} 
     = require('../controller/userCtrl')
 const router = express.Router()
 createUser
@@ -23,12 +28,18 @@ const {authMiddleware, isAdmin}=require("../middlewares/authMiddleware")
 router.post("/register",createUser)
 router.post("/login",loginUserCtlr)
 router.post('/forgot-password-token',forgotPasswordToken)
-router.post('/cart',userCart)
 
 router.put('/reset-password/:token',resetPassword)
 
 router.get("/users",getAllUser)
 router.get("/refresh",handleRefreshTOken)
+router.get("/cart",authMiddleware,getUserCart)
+router.post('/cart',authMiddleware,userCart)
+router.delete('/cart',authMiddleware,emptyCart)
+router.put('/cart/applycoupon',authMiddleware,applyCoupon)
+router.post('/cart/cash-order',authMiddleware,createOrder)
+router.get("/get-orders",authMiddleware,getOrder)
+
 router.get("/logout",logout)    
 router.get("/:id",authMiddleware,isAdmin,getaUser)
 router.get("/wishlist/:id",authMiddleware,getWishList)
