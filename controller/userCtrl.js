@@ -258,6 +258,42 @@ const resetPassword =asyncHandler (async (req,res)=>{
     res.json(user)
 })
 
+
+const getWishList = asyncHandler(async(req,res)=>{
+    const {_id}=req.user
+    try{
+        const findUser = await User.findById(_id).populate("wishlists")
+        res.json(findUser)
+
+    }catch(error){
+        throw new Error(error)
+    }
+})
+
+const saveAddress = asyncHandler(async (req,res,next)=>{
+    const {_id}=req.user
+    validateMongoDbId(_id)
+    try{
+        const updateaUser=await User.findByIdAndUpdate(_id,{
+            addres: req?.body?.addres
+        },
+        {
+            new:true,
+
+        })
+        res.json({
+            updateaUser
+        })
+
+    }catch(error){
+        throw new Error(error)
+    }
+})
+
+const userCart = asyncHandler(async (req,res)=>{
+
+})
+
 module.exports = {
     createUser,
     loginUserCtlr,
@@ -271,5 +307,8 @@ module.exports = {
     logout,
     updatePassword,
     forgotPasswordToken,
-    resetPassword
+    resetPassword,
+    getWishList,
+    saveAddress,
+    userCart
 }
