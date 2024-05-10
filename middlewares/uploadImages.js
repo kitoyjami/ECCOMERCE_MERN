@@ -3,6 +3,7 @@ const Jimp = require('jimp');
 const path = require('path');
 const fs = require('fs');
 
+
 const multerStorage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, path.join(__dirname, '../public/images'));
@@ -47,15 +48,18 @@ const productImgResize = async (req, res, next) => {
 };
 
 
+
 const blogImgResize = async (req, res, next) => {
-    if (!req.files) return next();
+    if (!req.files || !Array.isArray(req.files)) return next();
     await Promise.all(
         req.files.map(async (file) => {
-          const img=  await Jimp.read(file.path)
-                img.resize(300, 300)
-                .quality(90)
-                .write(`public/images/products/${file.filename}`);
-            fs.unlinkSync(`public/images/blogs/${file.filename}`);
+            try {
+                const img = await Jimp.read(file.path);
+                await img.resize(300, 300).quality(90).write(`../public/images/blogs/${file.filename}`);
+               fs.unlinkSync(`../public/images/blogs/${file.filename}`);
+            } catch (error) {
+                console.error("Error al procesar la imagen:", error);
+            }
         })
     );
     next();
