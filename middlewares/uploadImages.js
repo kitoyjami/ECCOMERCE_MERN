@@ -37,8 +37,8 @@ const productImgResize = async (req, res, next) => {
         req.files.map(async (file) => {
             try {
                 const img = await Jimp.read(file.path);
-                await img.resize(300, 300).quality(90).write(`../public/images/products/${file.filename}`);
-                fs.unlinkSync(`../public/images/products/${file.filename}`);
+                await img.resize(300, 300).quality(90).write(`public/images/products/${file.filename}`);
+                fs.unlinkSync(`public/images/products/${file.filename}`);
             } catch (error) {
                 console.error("Error al procesar la imagen:", error);
             }
@@ -55,8 +55,8 @@ const blogImgResize = async (req, res, next) => {
         req.files.map(async (file) => {
             try {
                 const img = await Jimp.read(file.path);
-                await img.resize(300, 300).quality(90).write(`../public/images/blogs/${file.filename}`);
-               fs.unlinkSync(`../public/images/blogs/${file.filename}`);
+                await img.resize(300, 300).quality(90).write(`public/images/blogs/${file.filename}`);
+               fs.unlinkSync(`public/images/blogs/${file.filename}`);
             } catch (error) {
                 console.error("Error al procesar la imagen:", error);
             }
