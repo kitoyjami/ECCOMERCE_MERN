@@ -188,29 +188,45 @@ const rating =asyncHandler (async (req,res)=>{
 
 })
 
-const uploadImages=asyncHandler (async (req,res)=>{
-    const {id}=req.params
-    validateMongoDbId(id)
-    try{
-        const uploader=(path)=>cloudinaryUploadImg(path,"images")
-        const urls=[]
-        const files = req.files
-        for(const file of files){
-            const {path}=file
-            const newpath= await uploader(path)
-            console.log(newpath)
-            urls.push(newpath)
-            fs.unlinkSync(path)
-        }
-        const findProduct=await Product.findByIdAndUpdate(id,{
-            images: urls.map(file=>{return file})
-        }, {new:true})
+const uploadImages = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    validateMongoDbId(id);
 
-        res.json(findProduct)
-    }catch(error){
-        throw new Error(error)
+    try {
+        const uploader = async (path) => {
+            try {
+                const newpath = await cloudinaryUploadImg(path, "images");
+                console.log(newpath);
+                return newpath;
+            } catch (error) {
+                console.error("Error al subir la imagen a Cloudinary:", error);
+                throw error; // Propagar el error para manejarlo en el bloque catch externo
+            }
+        };
+
+        const urls = [];
+
+        for (const file of req.files) {
+            const { path } = file;
+            const newpath = await uploader(path);
+            urls.push(newpath);
+
+            // Verificar si el archivo existe antes de intentar eliminarlo
+            if (fs.existsSync(path)) {
+                // Eliminar el archivo local
+                fs.unlinkSync(path);
+            } else {
+                console.warn(`El archivo no existe2: ${path}`);
+            }
+        }
+
+        const findProduct = await Product.findByIdAndUpdate(id, { images: urls }, { new: true });
+        res.json(findProduct);
+    } catch (error) {
+        console.error("Error en la carga de imágenes:", error);
+        throw new Error(error);
     }
-})
+});
 
 
 module.exports={
