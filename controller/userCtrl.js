@@ -334,7 +334,7 @@ const userCart = asyncHandler(async (req, res) => {
             return res.json(existingCart);
         }
 
-        // Si no hay un carrito existente, crear uno nuevo
+        // Si no hay un carrito existente, crear uno nuevo s
         const products = [];
         for (const item of cart) {
             const product = await Product.findById(item._id);
