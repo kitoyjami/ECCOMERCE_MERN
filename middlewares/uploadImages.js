@@ -56,17 +56,27 @@ const productImgResize = async (req, res, next) => {
 
 const blogImgResize = async (req, res, next) => {
     if (!req.files || !Array.isArray(req.files)) return next();
+
     await Promise.all(
         req.files.map(async (file) => {
             try {
                 const img = await Jimp.read(file.path);
-                await img.resize(300, 300).quality(90).write(`public/images/blogs/${file.filename}`);
-               fs.unlinkSync(`public/images/blogs/${file.filename}`);
+                await img.resize(300, 300).quality(90).writeAsync(`public/images/blogs/${file.filename}`);
+                console.log("Imagen redimensionada y escrita correctamente");
+
+                // Eliminar el archivo
+                if (fs.existsSync(`public/images/blogs/${file.filename}`)) {
+                    fs.unlinkSync(`public/images/blogs/${file.filename}`);
+                    console.log("Imagen eliminada correctamente");
+                } else {
+                    console.warn(`El archivo no existe: public/images/blogs/${file.filename}`);
+                }
             } catch (error) {
                 console.error("Error al procesar la imagen:", error);
             }
         })
     );
+
     next();
 };
 

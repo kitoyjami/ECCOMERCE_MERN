@@ -18,7 +18,8 @@ const { createUser, loginUserCtlr,
     emptyCart,
     applyCoupon,
     createOrder,
-    getOrder} 
+    getOrder,
+    updateOrderStatus} 
     = require('../controller/userCtrl')
 const router = express.Router()
 createUser
@@ -37,6 +38,8 @@ router.get("/cart",authMiddleware,getUserCart)
 router.post('/cart',authMiddleware,userCart)
 router.delete('/cart',authMiddleware,emptyCart)
 router.put('/cart/applycoupon',authMiddleware,applyCoupon)
+router.put('/order/update-order/:id',authMiddleware,updateOrderStatus)
+
 router.post('/cart/cash-order',authMiddleware,createOrder)
 router.get("/get-orders",authMiddleware,getOrder)
 
