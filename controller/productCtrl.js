@@ -3,7 +3,10 @@ const User = require("../models/userModel")
 const asyncHandler = require("express-async-handler")
 const slugify=require('slugify')
 const validateMongoDbId= require("../utils/validateMongodbid")
-const cloudinaryUploadImg = require("../utils/cloudinary")
+const {cloudinaryUploadImg,
+    cloudinaryDeleteImg
+
+ }= require("../utils/cloudinary")
 const fs = require('fs')
 
 const createProduct = asyncHandler(async (req,res)=>{
@@ -189,44 +192,48 @@ const rating =asyncHandler (async (req,res)=>{
 })
 
 const uploadImages = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    validateMongoDbId(id);
-
     try {
-        const uploader = async (path) => {
-            try {
-                const newpath = await cloudinaryUploadImg(path, "images");
-                console.log(newpath);
-                return newpath;
-            } catch (error) {
-                console.error("Error al subir la imagen a Cloudinary:", error);
-                throw error; // Propagar el error para manejarlo en el bloque catch externo
-            }
-        };
-
-        const urls = [];
-
-        for (const file of req.files) {
-            const { path } = file;
-            const newpath = await uploader(path);
-            urls.push(newpath);
-
-            // Verificar si el archivo existe antes de intentar eliminarlo
-            if (fs.existsSync(path)) {
-                // Eliminar el archivo local
-                fs.unlinkSync(path);
-            } else {
-                console.warn(`El archivo no existe2: ${path}`);
-            }
+        const uploader = (path) => cloudinaryUploadImg(path,"images")
+        const urls=[]
+        const files = req.files
+        for(const file of files){
+            const {path}= file
+            const newPath=await uploader(path)
+            console.log(newPath)
+            urls.push(newPath)
+            fs.unlinkSync(path)
         }
+        const images=urls.map((file)=>{
+            return file
+        })
+        res.json(images)
 
-        const findProduct = await Product.findByIdAndUpdate(id, { images: urls }, { new: true });
-        res.json(findProduct);
-    } catch (error) {
+    } catch (error) 
+    
+    {
         console.error("Error en la carga de imágenes:", error);
-        throw new Error(error);
+        res.status(500).json({ message: "Internal server error" });
     }
 });
+
+const deleteImages = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    try {
+        // Llamar a la función para eliminar la imagen en Cloudinary
+        const deletedImage = await cloudinaryDeleteImg(id);
+
+        // Si la eliminación es exitosa, responder con un mensaje de éxito
+        res.json({
+            message: "Image deleted successfully",
+            deletedImage: deletedImage
+        });
+    } catch (error) {
+        // Manejar errores, incluido el caso en que la imagen no exista
+        console.error("Error al eliminar la imagen:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 
 module.exports={
@@ -237,5 +244,6 @@ module.exports={
     deleteProduct,
     addToWishList,
     rating,
-    uploadImages
+    uploadImages,
+    deleteImages
 }

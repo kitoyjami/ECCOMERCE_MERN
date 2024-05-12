@@ -10,6 +10,8 @@ const coupoRouter = require("./routes/coupoRoute")
 const blogRouter = require("./routes/blogRoutes")
 const categoryRouter = require("./routes/prodcategoryRoute")
 const brandRouter = require("./routes/brandRoute")
+const colorRouter = require("./routes/colorRoute")
+
 const bcategoryRouter = require("./routes/blogCatRoute")
 const bodyParser = require('body-parser')
 const { notFound, errorHandler } = require('./middlewares/erroHandler')
@@ -37,6 +39,7 @@ app.use("/api/category", categoryRouter)
 app.use("/api/bcategory", bcategoryRouter)
 app.use("/api/coupon", coupoRouter)
 app.use("/api/brand", brandRouter)
+app.use("/api/color", colorRouter)
 
 
 app.use(notFound)
