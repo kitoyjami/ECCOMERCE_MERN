@@ -518,6 +518,16 @@ const getOrder = asyncHandler(async (req, res) => {
     }
 });
 
+const getAllOrder = asyncHandler(async (req, res) => {
+    try {
+        const alluserOrders = await Order.findOne().populate("products.product").populate('orderby').exec();
+        res.json(alluserOrders);
+    } catch (error) {
+        console.error("Error getting user orders:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+});
+
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
 
@@ -562,5 +572,6 @@ module.exports = {
     applyCoupon,
     createOrder,
     getOrder,
-    updateOrderStatus
+    updateOrderStatus,
+    getAllOrder
 }
