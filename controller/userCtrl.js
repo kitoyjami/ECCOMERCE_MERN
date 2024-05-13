@@ -520,7 +520,7 @@ const getOrder = asyncHandler(async (req, res) => {
 
 const getAllOrder = asyncHandler(async (req, res) => {
     try {
-        const alluserOrders = await Order.findOne().populate("products.product").populate('orderby').exec();
+        const alluserOrders = await Order.find().populate("products.product").populate('orderby').exec();
         res.json(alluserOrders);
     } catch (error) {
         console.error("Error getting user orders:", error);
