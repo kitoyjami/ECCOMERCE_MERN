@@ -505,7 +505,7 @@ const getOrder = asyncHandler(async (req, res) => {
     validateMongoDbId(_id);
 
     try {
-        const userOrders = await Order.findOne({ orderby: _id }).populate("products.product", "name price");
+        const userOrders = await Order.findOne({ orderby: _id }).populate("products.product").populate('orderby').exec();
 
         if (!userOrders) {
             return res.status(404).json({ message: 'No orders found for the user.' });
