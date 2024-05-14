@@ -13,10 +13,11 @@ const categoryRouter = require("./routes/prodcategoryRoute")
 const brandRouter = require("./routes/brandRoute")
 const colorRouter = require("./routes/colorRoute")
 const uploadRouter = require("./routes/uploadRoute")
-
+const bancoRouter = require("./routes/bancoRoute")
 const enquiryRouter = require("./routes/enqRoute")
 
 const bcategoryRouter = require("./routes/blogCatRoute")
+const wcategoryRouter = require("./routes/wcateRoute")
 const bodyParser = require('body-parser')
 const { notFound, errorHandler } = require('./middlewares/erroHandler')
 const cookieParser =require("cookie-parser")
@@ -47,6 +48,8 @@ app.use("/api/color", colorRouter)
 app.use("/api/enquiry", enquiryRouter)
 app.use("/api/upload",uploadRouter)
 app.use("/api/worker",workerRouter)
+app.use("/api/banco",bancoRouter)
+app.use("/api/wcategory",wcategoryRouter)
 
 
 app.use(notFound)
