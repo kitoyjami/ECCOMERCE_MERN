@@ -32,6 +32,10 @@ var userSchema = new mongoose.Schema({
         type: String,
         default: "user"
     },
+    photo:{
+        type:String,
+        default: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+    },
     isBLocked:{
         type:Boolean,
         default:false

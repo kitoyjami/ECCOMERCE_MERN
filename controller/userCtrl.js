@@ -158,7 +158,8 @@ const updateaUser= asyncHandler(async (req,res)=>{
             firstname: req?.body?.firstname,
             lasttname: req?.body?.lasttname,
             email:  req?.body?.email,
-            mobile: req?.body?.mobile
+            mobile: req?.body?.mobile,
+            photo: req?.body.photo
         },
         {
             new:true,
