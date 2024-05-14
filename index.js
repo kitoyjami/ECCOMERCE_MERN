@@ -6,6 +6,7 @@ const dotenv = require('dotenv').config()
 const PORT = process.env.PORT || 4000
 const authRouter=require("./routes/authRoute")
 const productRouter = require("./routes/productRoute")
+const workerRouter = require("./routes/workerRoute")
 const coupoRouter = require("./routes/coupoRoute")
 const blogRouter = require("./routes/blogRoutes")
 const categoryRouter = require("./routes/prodcategoryRoute")
@@ -45,6 +46,7 @@ app.use("/api/brand", brandRouter)
 app.use("/api/color", colorRouter)
 app.use("/api/enquiry", enquiryRouter)
 app.use("/api/upload",uploadRouter)
+app.use("/api/worker",workerRouter)
 
 
 app.use(notFound)
