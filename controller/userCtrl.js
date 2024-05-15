@@ -53,6 +53,7 @@ const loginUserCtlr=asyncHandler(async (req,res)=> {
             lasttname: findUser?.lasttname,
             email : findUser?.email,
             mobile: findUser?.mobile,
+            photo: findUser?.photo,
             token: generateToken(findUser?._id)
 
         })
