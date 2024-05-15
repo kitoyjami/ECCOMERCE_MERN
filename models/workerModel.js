@@ -39,7 +39,6 @@ var workerSchema = new mongoose.Schema({
     position:{
         type:String,
         required:true,
-        unique:true,
     },
     state:{
         type:Boolean,
