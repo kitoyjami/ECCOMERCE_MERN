@@ -26,8 +26,14 @@ var workerSchema = new mongoose.Schema({
     },
     photoP:[
         {
-            public_id:String,
-            url:String
+            public_id: {
+                type: String,
+                default: 'falta' // Establece aquí el valor predeterminado para 'public_id'
+              },
+              url: {
+                type: String,
+                default: 'https://www.hotelbooqi.com/wp-content/uploads/2021/12/128-1280406_view-user-icon-png-user-circle-icon-png.png' // Establece aquí el valor predeterminado para 'url'
+              }
         }
     ],
     photoDni:[
