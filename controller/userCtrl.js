@@ -27,40 +27,42 @@ const createUser =asyncHandler(async (req,res) => {
     }
 })
 
-const loginUserCtlr=asyncHandler(async (req,res)=> {
-    const {email,password} =req.body
-    // check if user exist or not 
-    const findUser=await User.findOne({email})
-    if(findUser && await findUser.isPasswordMatched(password))
-    {
-        const refreshToken=await generateRefreshToken(findUser?._id)
-        const updateuser=await User.findByIdAndUpdate(
-            findUser.id,
-            {
-            refreshToken:refreshToken
-            },
-            {new:true}
-        )
-        
-        res.cookie('refreshToken', refreshToken,{
-            httpOnly:true,
-            maxAge: 72*60*60*1000,
-        }) 
+const loginUserCtlr = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
 
+    // Verificar si el usuario existe
+    const findUser = await User.findOne({ email });
+
+    if (findUser && (await findUser.isPasswordMatched(password))) {
+        // Generar un token de actualización
+        const refreshToken = await generateRefreshToken(findUser._id);
+
+        // Actualizar el usuario con el nuevo token de actualización
+        await User.findByIdAndUpdate(findUser._id, { refreshToken });
+
+        // Configurar la cookie refreshToken en la respuesta
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            maxAge: 72 * 60 * 60 * 1000, // 72 horas
+            secure: true, // Solo enviar la cookie sobre HTTPS
+            sameSite: 'none', // Permitir que la cookie se envíe en peticiones de diferentes sitios
+        });
+
+        // Enviar la respuesta con los datos del usuario y el token de acceso
         res.json({
-            _id : findUser?.id,
-            firstname: findUser?.firstname,
-            lasttname: findUser?.lasttname,
-            email : findUser?.email,
-            mobile: findUser?.mobile,
-            photo: findUser?.photo,
-            token: generateToken(findUser?._id)
-
-        })
-    }else {
-        throw new Error("Invalid Crendential")
+            _id: findUser._id,
+            firstname: findUser.firstname,
+            lastname: findUser.lastname,
+            email: findUser.email,
+            mobile: findUser.mobile,
+            photo: findUser.photo,
+            token: generateToken(findUser._id),
+        });
+    } else {
+        // Usuario no encontrado o credenciales inválidas
+        throw new Error("Invalid credentials");
     }
-})
+});
 
 //handle refresh token
 
