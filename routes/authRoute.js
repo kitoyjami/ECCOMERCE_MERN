@@ -45,7 +45,7 @@ router.post('/cart/cash-order',authMiddleware,createOrder)
 router.get("/get-orders",authMiddleware,getOrder)
 router.get("/get-all-orders",authMiddleware,isAdmin,getAllOrder)
 
-router.get("/logout",logout)    
+
 router.get("/:id",authMiddleware,isAdmin,getaUser)
 router.get("/wishlist/:id",authMiddleware,getWishList)
 
@@ -58,7 +58,7 @@ router.put("/password",authMiddleware,updatePassword)
 
 router.put("/block-user/:id",authMiddleware,isAdmin,blockUser)
 router.put("/unblock-user/:id",authMiddleware,isAdmin,unblockUser)
-    
+router.post("/logout",logout)    
 
 
 module.exports=router
