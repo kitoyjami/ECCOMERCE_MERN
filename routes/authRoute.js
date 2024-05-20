@@ -58,7 +58,7 @@ router.put("/password",authMiddleware,updatePassword)
 
 router.put("/block-user/:id",authMiddleware,isAdmin,blockUser)
 router.put("/unblock-user/:id",authMiddleware,isAdmin,unblockUser)
-router.post("/logout",logout)    
+router.post("/logout",authMiddleware,logout)    
 
 
 module.exports=router
