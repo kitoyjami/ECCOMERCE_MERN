@@ -48,7 +48,7 @@ const loginUserCtlr = asyncHandler(async (req, res) => {
         res.json({
             _id: findUser.id,
             firstname: findUser.firstname,
-            lasttname: findUser.lastname,
+            lasttname: findUser.lasttname,
             email: findUser.email,
             mobile: findUser.mobile,
             photo: findUser.photo,
