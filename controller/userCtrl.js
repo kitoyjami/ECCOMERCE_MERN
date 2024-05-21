@@ -29,41 +29,35 @@ const createUser =asyncHandler(async (req,res) => {
 
 const loginUserCtlr = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-
-    // Verificar si el usuario existe
     const findUser = await User.findOne({ email });
 
-    if (findUser && (await findUser.isPasswordMatched(password))) {
-        // Generar un token de actualización
+    if (findUser && await findUser.isPasswordMatched(password)) {
         const refreshToken = await generateRefreshToken(findUser._id);
+        await User.findByIdAndUpdate(findUser.id, { refreshToken }, { new: true });
 
-        // Actualizar el usuario con el nuevo token de actualización
-        await User.findByIdAndUpdate(findUser._id, { refreshToken });
+        // Log para verificar la creación de la cookie
+        console.log('Setting cookie for refreshToken:', refreshToken);
 
-        // Configurar la cookie refreshToken en la respuesta
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            maxAge: 72 * 60 * 60 * 1000, // 72 horas
-            secure: true, // Solo enviar la cookie sobre HTTPS
-            sameSite: 'none', // Permitir que la cookie se envíe en peticiones de diferentes sitios
+            secure: true,
+            sameSite: 'none',
+            maxAge: 72 * 60 * 60 * 1000
         });
 
-        // Enviar la respuesta con los datos del usuario y el token de acceso
         res.json({
-            _id: findUser._id,
+            _id: findUser.id,
             firstname: findUser.firstname,
             lastname: findUser.lastname,
             email: findUser.email,
             mobile: findUser.mobile,
             photo: findUser.photo,
-            token: generateToken(findUser._id),
+            token: generateToken(findUser._id)
         });
     } else {
-        // Usuario no encontrado o credenciales inválidas
-        throw new Error("Invalid credentials");
+        throw new Error("Invalid Credentials");
     }
 });
-
 //handle refresh token
 
 const handleRefreshTOken =asyncHandler (async (req,res) =>{
