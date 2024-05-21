@@ -44,7 +44,7 @@ const loginUserCtlr = asyncHandler(async (req, res) => {
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             maxAge: 72 * 60 * 60 * 1000, // 72 horas
-            secure: false, // Solo enviar la cookie sobre HTTPS
+            secure: true, // Solo enviar la cookie sobre HTTPS
             sameSite: 'none', // Permitir que la cookie se envíe en peticiones de diferentes sitios
         });
 
