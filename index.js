@@ -27,7 +27,7 @@ const cors = require("cors")
 
 
 dbConnect()
-const allowedOrigins = ['http://localhost:5173', 'https://crsleon.info'];
+const allowedOrigins = ['http://localhost:5173', 'https://www.crsleon.info'];
 app.use(cors({
     origin: function (origin, callback) {
         // Permitir solicitudes sin origen (como las de herramientas locales)
