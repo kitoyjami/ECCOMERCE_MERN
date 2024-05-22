@@ -182,7 +182,7 @@ const getServicios = asyncHandler(async (req, res) => {
 // @route   GET /api/servicios/:id
 // @access  Público
 const getServicioById = asyncHandler(async (req, res) => {
-  const servicio = await Servicio.findById(req.params.id)
+  const servicio = await Servicio.findById(req.params.id);
 
   if (!servicio) {
     res.status(404);

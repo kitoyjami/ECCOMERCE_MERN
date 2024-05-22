@@ -1,5 +1,6 @@
 const Attendance = require('../models/attendanceModel');
 const asyncHandler=require('express-async-handler')
+const Servicio = require('../models/servicioModel')
 
 
 // Crear nueva asistencia
@@ -15,7 +16,7 @@ const createAttendance = asyncHandler(async (req, res) => {
       horaSalida: horaSalida || null,
       registradoPor: req.user._id
     });
-
+    console.log(servicio)
     // Guardar la asistencia
     await attendance.save();
 
