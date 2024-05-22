@@ -258,15 +258,18 @@ const updateServicio = asyncHandler(async (req, res) => {
 // @route   DELETE /api/servicios/:id
 // @access  Privado
 const deleteServicio = asyncHandler(async (req, res) => {
-  const servicio = await Servicio.findById(req.params.id);
+  try {
+    const servicio = await Servicio.findByIdAndDelete(req.params.id);
+    console.log(servicio)
 
-  if (!servicio) {
-    res.status(404);
-    throw new Error('Servicio no encontrado');
+    if (!servicio) {
+      return res.status(404).json({ message: 'Servicio no encontrado' });
+    }
+
+    res.status(200).json({ message: 'Servicio eliminado exitosamente' });
+  } catch (error) {
+    console.error(`Error eliminando el servicio: ${error.message}`);
+    res.status(500).json({ message: 'Error al eliminar el servicio' });
   }
-
-  await servicio.remove();
-  res.json({ message: 'Servicio eliminado' });
 });
-
 module.exports = { getServicios, getServicioById, createServicio, updateServicio, deleteServicio };

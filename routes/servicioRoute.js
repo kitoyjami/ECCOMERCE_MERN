@@ -17,6 +17,6 @@ router.get('/', getServicios);
 router.put('/:id',authMiddleware, updateServicio);
 
 // Ruta para eliminar un reporte diario por fecha
-router.delete('/:fecha',authMiddleware, deleteServicio);
+router.delete('/:id',authMiddleware, deleteServicio);
 
 module.exports=router
