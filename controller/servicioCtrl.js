@@ -142,12 +142,7 @@ const getServicios = asyncHandler(async (req, res) => {
           path: 'trabajador',
         })
         .select('horaEntrada horaSalida trabajador');
-        const attendances2 = await Attendance.find({ servicio: service._id })
-        .populate("trabajador servicio") 
-        
-          console.log("hola1: " , attendances2[0].trabajador[0].firstname)
-     
-        ;
+
       // Crear un array para almacenar los detalles de la asistencia
       const attendanceDetails = [];
 
@@ -159,14 +154,19 @@ const getServicios = asyncHandler(async (req, res) => {
         totalHoursWorked += hoursWorked;
         const attendanceDate = attendance.horaEntrada.toDateString();
 
+        // Verificar si el trabajador existe antes de acceder a sus propiedades
+        let trabajadorNombre = "Trabajador no asignado";
+        if (attendance.trabajador && attendance.trabajador.length > 0) {
+          trabajadorNombre = attendance.trabajador[0].firstname + " " + attendance.trabajador[0].lastname;
+        }
+
         attendanceDetails.push({
-          trabajador: attendance.trabajador[0].firstname + " " + attendance.trabajador[0].lasttname , // Incluir toda la información del trabajador
+          trabajador: trabajadorNombre, // Incluir toda la información del trabajador
           fecha: attendanceDate,
           horasTrabajadas: hoursWorked
         });
       }
-     
-        
+
       // Agregar los detalles de la asistencia y el total de horas trabajadas al objeto de servicio
       services[i].asistenciaTrabajo = attendanceDetails;
       services[i].totalHorasTrabajadas = totalHoursWorked;
