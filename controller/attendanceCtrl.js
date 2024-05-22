@@ -9,14 +9,13 @@ const createAttendance = asyncHandler(async (req, res) => {
     const { trabajador, servicio, horaEntrada, horaSalida } = req.body;
 
     // Crear la nueva asistencia
-    const attendance = new Attendance({
+    const attendance = new Attendance({ 
       trabajador,
       servicio,
       horaEntrada,
       horaSalida: horaSalida || null,
       registradoPor: req.user._id
     });
-    console.log(servicio)
     // Guardar la asistencia
     await attendance.save();
 
