@@ -11,7 +11,7 @@ router.post('/',authMiddleware, createServicio);
 router.get('/:id',authMiddleware, getServicioById)
 
 // Ruta para obtener todos los reportes diarios
-router.get('/',authMiddleware, getServicios);
+router.get('/', getServicios);
 
 // Ruta para actualizar un reporte diario por fecha
 router.put('/:id',authMiddleware, updateServicio);
