@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const attendanceSchema = new Schema({
-  trabajador: [{
+  trabajador: {
     type: Schema.Types.ObjectId,
     ref: 'Worker',
     required: true
-  }],
+  },
   servicio: {
     type: Schema.Types.ObjectId,
     ref: 'Servicio',
