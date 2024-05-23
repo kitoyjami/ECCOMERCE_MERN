@@ -24,6 +24,11 @@ var workerSchema = new mongoose.Schema({
         required:true,
         unique:true,
     },
+    dni:{
+        type:String,
+        unique:true,
+        default:"No agregado",
+    },
     photoP:[
         {
             public_id: {
