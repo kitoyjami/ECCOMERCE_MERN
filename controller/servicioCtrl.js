@@ -126,7 +126,6 @@ const Attendance =require('../models/attendanceModel')
   }
 }); */
 
-
 const getServicios = asyncHandler(async (req, res) => {
   try {
     // Recuperar todos los servicios
@@ -141,7 +140,7 @@ const getServicios = asyncHandler(async (req, res) => {
         .populate({
           path: 'trabajador',
         })
-        .select('horaEntrada horaSalida trabajador');
+        .select('horaEntrada horaSalida horaAlmuerzo trabajador');
 
       // Crear un array para almacenar los detalles de la asistencia
       const attendanceDetails = [];
@@ -150,14 +149,31 @@ const getServicios = asyncHandler(async (req, res) => {
       let totalHoursWorked = 0;
       for (let j = 0; j < attendances.length; j++) {
         const attendance = attendances[j];
-        const hoursWorked = (attendance.horaSalida - attendance.horaEntrada) / (1000 * 60 * 60); // Convertir a horas
-        totalHoursWorked += hoursWorked;
+        let hoursWorked = 0;
+
+        if (attendance.horaSalida) {
+          // Si hay hora de salida, calcular las horas trabajadas
+          hoursWorked = (attendance.horaSalida - attendance.horaEntrada) / (1000 * 60 * 60); // Convertir a horas
+
+          // Si el estado de horaAlmuerzo es verdadero, restar una hora de almuerzo
+          if (attendance.horaAlmuerzo !== undefined ? attendance.horaAlmuerzo : true) {
+            hoursWorked -= 1; // Restar una hora de almuerzo
+          }
+
+          // Asegurarse de que no sea un número negativo
+          if (hoursWorked < 0) {
+            hoursWorked = 0;
+          }
+
+          totalHoursWorked += hoursWorked;
+        }
+
         const attendanceDate = attendance.horaEntrada.toDateString();
 
         // Verificar si el trabajador existe antes de acceder a sus propiedades
         let trabajadorNombre = "Trabajador no asignado";
-        if (attendance.trabajador && attendance.trabajador.length > 0) {
-          trabajadorNombre = attendance.trabajador[0].firstname + " " + attendance.trabajador[0].lastname;
+        if (attendance.trabajador && attendance.trabajador) {
+          trabajadorNombre = attendance.trabajador.firstname + " " + attendance.trabajador.lasttname;
         }
 
         attendanceDetails.push({

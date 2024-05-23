@@ -2,6 +2,7 @@ const Attendance = require('../models/attendanceModel');
 const asyncHandler=require('express-async-handler')
 const Servicio = require('../models/servicioModel')
 const mongoose = require('mongoose');
+const attendanceModel = require('../models/attendanceModel');
 
 
 
@@ -20,18 +21,21 @@ const createAttendance = asyncHandler(async (req, res) => {
     });
     // Guardar la asistencia
     await attendance.save();
+    const horaAlmuerzo = attendance.horaAlmuerzo
+    // Calcular la duración de la jornada si hay hora de salida y se descuenta la hora de almuerzo
+    if (horaSalida && horaAlmuerzo) {
+      let nuevaDuracion = (new Date(horaSalida) - new Date(horaEntrada)) / 1000 / 60; // Duración en minutos
+      nuevaDuracion -= 60; // Restar una hora si se descuenta el almuerzo
+      attendance.duracionJornada = nuevaDuracion;
+      await attendance.save();
 
-    if (horaSalida) {
-      // Calcular la duración de la jornada
-      const duracionJornada = (new Date(horaSalida) - new Date(horaEntrada)) / 1000 / 60; // Duración en minutos
-
-      // Actualizar el servicio con la nueva asistencia
+      // Actualizar el servicio con la nueva asistencia y las horas trabajadas
       await Servicio.findByIdAndUpdate(servicio, {
         $push: { asistenciaTrabajo: attendance._id },
-        $inc: { totalHorasTrabajadas: duracionJornada }
+        $inc: { totalHorasTrabajadas: nuevaDuracion }
       });
     } else {
-      // Solo agregar la asistencia sin calcular horas trabajadas
+      // Solo agregar la asistencia sin calcular horas trabajadas si no hay hora de salida
       await Servicio.findByIdAndUpdate(servicio, {
         $push: { asistenciaTrabajo: attendance._id }
       });
@@ -42,10 +46,10 @@ const createAttendance = asyncHandler(async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-// Actualizar asistencia
+
 const updateAttendance = asyncHandler(async (req, res) => {
   try {
-    const { horaEntrada, horaSalida } = req.body;
+    const { horaEntrada, horaSalida, horaAlmuerzo } = req.body;
 
     // Encontrar la asistencia actual
     const attendance = await Attendance.findById(req.params.id);
@@ -53,23 +57,33 @@ const updateAttendance = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: 'Asistencia no encontrada' });
     }
 
+    // Si la asistencia no tiene hora de salida y no se proporcionan hora de entrada y salida, no se permite modificar la hora de almuerzo
+    if (!attendance.horaSalida && !horaEntrada && !horaSalida && horaAlmuerzo !== undefined) {
+      return res.status(400).json({ message: 'No se puede modificar la hora de almuerzo si no se ha registrado la hora de salida' });
+    }
+
     // Calcular la duración anterior y la nueva duración si la hora de salida está presente
     const duracionAnterior = attendance.duracionJornada;
     let nuevaDuracion = duracionAnterior;
 
-    if (horaSalida) {
-      nuevaDuracion = (new Date(horaSalida) - new Date(horaEntrada || attendance.horaEntrada)) / 1000 / 60; // Duración en minutos
+    if (horaSalida !== undefined || attendance.horaSalida) {
+      // Si la hora de salida está definida, se usa la horaSalida proporcionada, de lo contrario, se mantiene la horaSalida actual
+      const nuevaHoraSalida = horaSalida || attendance.horaSalida;
+      const horaAlmuerzoMinutes = horaAlmuerzo ? 60 : 0;
+      nuevaDuracion = ((new Date(nuevaHoraSalida) - new Date(horaEntrada || attendance.horaEntrada)) / 1000 / 60) - horaAlmuerzoMinutes; // Duración en minutos
     }
 
     // Actualizar la asistencia
     attendance.horaEntrada = horaEntrada || attendance.horaEntrada;
-    attendance.horaSalida = horaSalida || attendance.horaSalida;
+    attendance.horaSalida = horaSalida !== undefined ? horaSalida : attendance.horaSalida;
+    attendance.horaAlmuerzo = horaAlmuerzo !== undefined ? horaAlmuerzo : attendance.horaAlmuerzo;
     attendance.duracionJornada = nuevaDuracion;
     await attendance.save();
 
-    if (horaSalida) {
-      // Actualizar el servicio con la nueva duración de la jornada
+    if (horaSalida !== undefined) {
+      // Calcular la diferencia en la duración de la jornada
       const difference = nuevaDuracion - duracionAnterior;
+      // Actualizar el servicio con la nueva duración de la jornada
       await Servicio.findByIdAndUpdate(attendance.servicio, {
         $inc: { totalHorasTrabajadas: difference }
       });

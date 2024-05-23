@@ -20,7 +20,11 @@ const attendanceSchema = new Schema({
     type: Date,
     validate: {
       validator: function(value) {
-        return value > this.horaEntrada;
+        // Solo validamos si la hora de salida está definida
+        if (this.horaSalida) {
+          return value > this.horaEntrada;
+        }
+        return true; // Si la hora de salida no está definida, no validamos
       },
       message: 'La hora de salida debe ser posterior a la hora de entrada'
     }
@@ -43,25 +47,19 @@ const attendanceSchema = new Schema({
   notas: {
     type: String
   },
+  horaAlmuerzo: {
+    type: Boolean,
+    default: true // Indica si se descuenta la hora de almuerzo
+  },
   duracionJornada: {
     type: Number, // Duración en minutos u horas
-    default: function() {
-      if (this.horaEntrada && this.horaSalida) {
-        return (this.horaSalida - this.horaEntrada) / 1000 / 60; // Ejemplo en minutos
-      }
-      return 0;
-    }
+    default:0
   },
   tipoJornada: {
     type: String,
     enum: ['Jornada completa', 'Media jornada', 'Otro'],
     default: 'Jornada completa'
   },
-  pausas: [{
-    inicio: Date,
-    fin: Date,
-    duracion: Number // Duración en minutos
-  }],
   historialModificaciones: [{
     fecha: {
       type: Date,
