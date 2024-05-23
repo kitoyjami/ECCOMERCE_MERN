@@ -96,31 +96,30 @@ const updateAttendance = asyncHandler(async (req, res) => {
 
 
 
-const deleteAttendance = asyncHandler(async (req, res) => {
-  try {
-    const attendance = await Attendance.findById(req.params.id);
-    if (!attendance) {
-      return res.status(404).json({ message: 'Asistencia no encontrada' });
+  const deleteAttendance = asyncHandler(async (req, res) => {
+    try {
+      const attendance = await Attendance.findById(req.params.id);
+      if (!attendance) {
+        return res.status(404).json({ message: 'Asistencia no encontrada' });
+      }
+  
+      // Calcular la duración de la jornada
+      const duracionJornada = attendance.duracionJornada;
+  
+      // Eliminar la asistencia
+      await Attendance.findByIdAndDelete(req.params.id);
+  
+      // Actualizar el servicio
+      await Servicio.findByIdAndUpdate(attendance.servicio, {
+        $pull: { asistenciaTrabajo: attendance._id },
+        $inc: { totalHorasTrabajadas: -duracionJornada }
+      });
+  
+      res.status(200).json({ message: 'Asistencia eliminada correctamente' });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
-
-    // Calcular la duración de la jornada
-    const duracionJornada = attendance.duracionJornada;
-
-    // Eliminar la asistencia
-    await attendance.remove();
-
-    // Actualizar el servicio
-    await Servicio.findByIdAndUpdate(attendance.servicio, {
-      $pull: { asistenciaTrabajo: attendance._id },
-      $inc: { totalHorasTrabajadas: -duracionJornada }
-    });
-
-    res.status(200).json({ message: 'Asistencia eliminada correctamente' });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
+  });
   module.exports ={
     createAttendance,
     updateAttendance,
