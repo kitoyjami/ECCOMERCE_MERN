@@ -1,6 +1,8 @@
 const Attendance = require('../models/attendanceModel');
 const asyncHandler=require('express-async-handler')
 const Servicio = require('../models/servicioModel')
+const mongoose = require('mongoose');
+
 
 
 // Crear nueva asistencia
@@ -79,10 +81,62 @@ const updateAttendance = asyncHandler(async (req, res) => {
   }
 });
 
-  const getAttendances = asyncHandler(async (req, res) => {
-    const attendances = await Attendance.find().populate('trabajador servicio registradoPor');
+const getAttendances = asyncHandler(async (req, res) => {
+  try {
+    const { date, serviceId, workerId, startDate, endDate } = req.query;
+
+    let filter = {};
+
+    // Filtrar por fecha específica
+    if (date) {
+      const startOfDay = new Date(date);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+
+      filter.horaEntrada = {
+        $gte: startOfDay,
+        $lt: endOfDay
+      };
+    }
+
+    // Filtrar por servicio
+    if (serviceId) {
+      if (mongoose.Types.ObjectId.isValid(serviceId)) {
+        filter.servicio = new mongoose.Types.ObjectId(serviceId);
+      } else {
+        return res.status(400).json({ error: 'Invalid serviceId' });
+      }
+    }
+
+    // Filtrar por trabajador
+    if (workerId) {
+      if (mongoose.Types.ObjectId.isValid(workerId)) {
+        filter.trabajador = new mongoose.Types.ObjectId(workerId);
+      } else {
+        return res.status(400).json({ error: 'Invalid workerId' });
+      }
+    }
+
+    // Filtrar entre dos fechas
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      start.setUTCHours(0, 0, 0, 0);
+      const end = new Date(endDate);
+      end.setUTCHours(23, 59, 59, 999);
+
+      filter.horaEntrada = {
+        $gte: start,
+        $lt: end
+      };
+    }
+
+    const attendances = await Attendance.find(filter).populate('trabajador servicio registradoPor');
     res.json(attendances);
-  });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
   
 
   const getAttendanceById = asyncHandler(async (req, res) => {
