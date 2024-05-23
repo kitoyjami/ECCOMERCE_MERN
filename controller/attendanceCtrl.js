@@ -23,9 +23,9 @@ const createAttendance = asyncHandler(async (req, res) => {
     await attendance.save();
     const horaAlmuerzo = attendance.horaAlmuerzo
     // Calcular la duración de la jornada si hay hora de salida y se descuenta la hora de almuerzo
-    if (horaSalida && horaAlmuerzo) {
+    if (horaSalida ) {
       let nuevaDuracion = (new Date(horaSalida) - new Date(horaEntrada)) / 1000 / 60; // Duración en minutos
-      nuevaDuracion -= 60; // Restar una hora si se descuenta el almuerzo
+      // Restar una hora si se descuenta el almuerzo
       attendance.duracionJornada = nuevaDuracion;
       await attendance.save();
 

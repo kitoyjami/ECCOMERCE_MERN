@@ -49,7 +49,7 @@ const attendanceSchema = new Schema({
   },
   horaAlmuerzo: {
     type: Boolean,
-    default: true // Indica si se descuenta la hora de almuerzo
+    default: false // Indica si se descuenta la hora de almuerzo
   },
   duracionJornada: {
     type: Number, // Duración en minutos u horas
