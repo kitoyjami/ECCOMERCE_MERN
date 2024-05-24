@@ -65,17 +65,11 @@ const updateAttendance = asyncHandler(async (req, res) => {
     // Calcular la duración anterior y la nueva duración si la hora de salida está presente
     const duracionAnterior = attendance.duracionJornada;
     let nuevaDuracion = duracionAnterior;
-    let horaAlmuerzoMinutes=0
+
     if (horaSalida !== undefined || attendance.horaSalida) {
       // Si la hora de salida está definida, se usa la horaSalida proporcionada, de lo contrario, se mantiene la horaSalida actual
       const nuevaHoraSalida = horaSalida || attendance.horaSalida;
-      if(horaAlmuerzo || attendance.horaAlmuerzo)
-        {
-           horaAlmuerzoMinutes= 60
-        }
-        else{
-          horaAlmuerzoMinutes= 0
-        }
+      const horaAlmuerzoMinutes = horaAlmuerzo ? 60 : 0;
       nuevaDuracion = ((new Date(nuevaHoraSalida) - new Date(horaEntrada || attendance.horaEntrada)) / 1000 / 60) - horaAlmuerzoMinutes; // Duración en minutos
     }
 
