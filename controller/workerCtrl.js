@@ -160,16 +160,6 @@ const getaWorker = asyncHandler(async (req,res)=>
             query = query.select('-__v');
           }
       
-          // Paginación
-          const page = req.query.page * 1 || 1;
-          const limit = req.query.limit * 1 || 10;
-          const skip = (page - 1) * limit;
-          query = query.skip(skip).limit(limit);
-      
-          if (req.query.page) {
-            const workerCount = await Worker.countDocuments();
-            if (skip >= workerCount) throw new Error('This page does not exist');
-          }
       
           // Ejecutar la consulta
           const workers = await query;
