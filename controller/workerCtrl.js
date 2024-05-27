@@ -64,7 +64,7 @@ const getaWorker = asyncHandler(async (req,res)=>
     }
 })
 
-const getAllWorker = asyncHandler(async (req,res)=>
+/* const getAllWorker = asyncHandler(async (req,res)=>
     {
         try {
 
@@ -119,7 +119,68 @@ const getAllWorker = asyncHandler(async (req,res)=>
             throw new Error(error)
         }
     })
-    
+     */
+
+    const getAllWorker = asyncHandler(async (req, res) => {
+        try {
+          // Construir el objeto de consulta
+          const queryObj = { ...req.query };
+          const excludeFields = ['page', 'sort', 'limit', 'fields'];
+          excludeFields.forEach(el => delete queryObj[el]);
+      
+          // Convertir operadores gte, gt, lte, lt a formato MongoDB
+          let queryStr = JSON.stringify(queryObj);
+          queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+      
+          // Parsear el objeto de consulta
+          let query = Worker.find(JSON.parse(queryStr));
+
+      
+          // Filtrar por estado (trabajando actualmente o no)
+          if (req.query.state !== undefined) {
+            query = query.find({ state: req.query.state });
+          }
+      
+          // Logging para depuración
+          console.log('Consulta MongoDB:', query.getFilter());
+      
+          // Sorting
+          if (req.query.sort) {
+            const sortBy = req.query.sort.split(',').join(' ');
+            query = query.sort(sortBy);
+          } else {
+            query = query.sort('-createdAt');
+          }
+      
+          // Limitar los campos
+          if (req.query.fields) {
+            const fields = req.query.fields.split(',').join(' ');
+            query = query.select(fields);
+          } else {
+            query = query.select('-__v');
+          }
+      
+          // Paginación
+          const page = req.query.page * 1 || 1;
+          const limit = req.query.limit * 1 || 10;
+          const skip = (page - 1) * limit;
+          query = query.skip(skip).limit(limit);
+      
+          if (req.query.page) {
+            const workerCount = await Worker.countDocuments();
+            if (skip >= workerCount) throw new Error('This page does not exist');
+          }
+      
+          // Ejecutar la consulta
+          const workers = await query;
+      
+          res.json(workers);
+        } catch (error) {
+          console.error('Error en la consulta:', error);
+          res.status(400).json({ error: error.message });
+        }
+      });
+      
 
 const addToWishList =asyncHandler(async (req,res)=>{
     const {_id} =req.user
