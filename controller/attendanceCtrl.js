@@ -127,7 +127,7 @@ const updateAttendance = asyncHandler(async (req, res) => {
     }
 
     // Si la asistencia no tiene hora de salida y se intenta modificar la hora de almuerzo, retornar error
-    if (!attendance.horaSalida && updates.horaAlmuerzo !== undefined) {
+    if (!attendance.horaSalida && !updates.horaAlmuerzo) {
       return res.status(400).json({ message: 'No se puede modificar la hora de almuerzo si no se ha registrado la hora de salida' });
     }
 
