@@ -7,7 +7,6 @@ const ProductoCrsSchema = new Schema({
     },
     marca: { 
         type: String, 
-        required: true 
     },
     tipo: { 
         type: Schema.Types.ObjectId, 

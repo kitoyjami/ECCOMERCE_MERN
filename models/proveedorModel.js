@@ -20,11 +20,6 @@ const ProveedorSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'TipoProducto' 
         }],
-    tiposServicio: [
-        { 
-            type: Schema.Types.ObjectId, 
-            ref: 'TipoServiciosTercero'
-        }],
     direccion: { 
         type: String, 
         required: true 

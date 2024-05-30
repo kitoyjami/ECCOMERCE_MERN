@@ -20,9 +20,8 @@ const dailyRouter = require("./routes/partediarioRoute")
 const servicioRouter = require("./routes/servicioRoute")
 const unidadesRouter = require("./routes/unidadesRoute")
 const tipoProductoRouter = require("./routes/tipoProductoRoute")
-const tipoTerceroRouter = require("./routes/tipoServicioTerceroRoute")
+
 const productoCrsRouter = require("./routes/productCrsRoute")
-const tercerosRouter = require("./routes/servicioTerceroRoute")
 const proveedoresRouter = require("./routes/proveedorRoute")
 
 const bcategoryRouter = require("./routes/blogCatRoute")
@@ -74,9 +73,8 @@ app.use("/api/dailyreport",dailyRouter)
 app.use("/api/servicio",servicioRouter)
 app.use("/api/unidades",unidadesRouter)
 app.use("/api/tipo-producto",tipoProductoRouter)
-app.use("/api/tipo-tercero",tipoTerceroRouter)
+
 app.use("/api/productocrs",productoCrsRouter)
-app.use("/api/terceros",tercerosRouter)
 app.use("/api/proveedores",proveedoresRouter)
 
 
