@@ -20,6 +20,7 @@ const dailyRouter = require("./routes/partediarioRoute")
 const servicioRouter = require("./routes/servicioRoute")
 const unidadesRouter = require("./routes/unidadesRoute")
 const tipoProductoRouter = require("./routes/tipoProductoRoute")
+const rendicionCuentaRouter = require("./routes/rendicionCuentaRoute")
 
 const productoCrsRouter = require("./routes/productCrsRoute")
 const proveedoresRouter = require("./routes/proveedorRoute")
@@ -76,6 +77,7 @@ app.use("/api/tipo-producto",tipoProductoRouter)
 
 app.use("/api/productocrs",productoCrsRouter)
 app.use("/api/proveedores",proveedoresRouter)
+app.use("/api/rendicion-cuenta",rendicionCuentaRouter)
 
 
 app.use(notFound)

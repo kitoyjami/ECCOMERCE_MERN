@@ -33,7 +33,7 @@ const createProveedor = asyncHandler(
 const getProveedores = asyncHandler (
         async (req, res) => {
             try {
-                const proveedores = await Proveedor.find().populate('tiposProducto').populate('tiposServicio').populate('registradoPor.user');
+                const proveedores = await Proveedor.find().populate('tiposProducto').populate('registradoPor.user');
                 res.status(200).json(proveedores);
             } catch (error) {
                 res.status(500).json({ message: 'Error al obtener los proveedores', error });
@@ -46,7 +46,7 @@ const getProveedores = asyncHandler (
 const getProveedorById = asyncHandler (
         async (req, res) => {
             try {
-                const proveedor = await Proveedor.findById(req.params.id).populate('tiposProducto').populate('tiposServicio').populate('registradoPor.user');
+                const proveedor = await Proveedor.findById(req.params.id).populate('tiposProducto').populate('registradoPor.user');
                 if (!proveedor) {
                     return res.status(404).json({ message: 'Proveedor no encontrado' });
                 }
@@ -77,7 +77,7 @@ const updateProveedor =asyncHandler(
                         registradoPor: { user: req.user._id }
                     },
                     { new: true }
-                ).populate('tiposProducto').populate('tiposServicio').populate('registradoPor.user');
+                ).populate('tiposProducto').populate('registradoPor.user');
                 
                 if (!proveedorActualizado) {
                     return res.status(404).json({ message: 'Proveedor no encontrado' });
