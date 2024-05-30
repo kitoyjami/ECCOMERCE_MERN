@@ -22,6 +22,8 @@ const unidadesRouter = require("./routes/unidadesRoute")
 const tipoProductoRouter = require("./routes/tipoProductoRoute")
 const tipoTerceroRouter = require("./routes/tipoServicioTerceroRoute")
 const productoCrsRouter = require("./routes/productCrsRoute")
+const tercerosRouter = require("./routes/servicioTerceroRoute")
+const proveedoresRouter = require("./routes/proveedorRoute")
 
 const bcategoryRouter = require("./routes/blogCatRoute")
 const wcategoryRouter = require("./routes/wcateRoute")
@@ -74,6 +76,9 @@ app.use("/api/unidades",unidadesRouter)
 app.use("/api/tipo-producto",tipoProductoRouter)
 app.use("/api/tipo-tercero",tipoTerceroRouter)
 app.use("/api/productocrs",productoCrsRouter)
+app.use("/api/terceros",tercerosRouter)
+app.use("/api/proveedores",proveedoresRouter)
+
 
 app.use(notFound)
 app.use(errorHandler)
