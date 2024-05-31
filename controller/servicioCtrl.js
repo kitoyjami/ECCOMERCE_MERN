@@ -240,36 +240,55 @@ const createServicio = asyncHandler(async (req, res) => {
 // @route   PUT /api/servicios/:id
 // @access  Privado
 const updateServicio = asyncHandler(async (req, res) => {
-    try {
-      const servicio = await Servicio.findById(req.params.id);
-  
-      if (!servicio) {
-        return res.status(404).json({ message: 'Servicio no encontrado' });
-      }
-  
-      const { nombre, descripcion, costoEstimado, caracteristicas, fechaInicio, fechaFin, numeroOrdenCompra, fechaAprobacionOrdenCompra, nombreCliente, ubicacion } = req.body;
-  
-      // Crear un objeto con los campos a actualizar
-      const camposActualizados = {};
-      if (nombre) camposActualizados.nombre = nombre;
-      if (descripcion) camposActualizados.descripcion = descripcion;
-      if (costoEstimado) camposActualizados.costoEstimado = costoEstimado;
-      if (caracteristicas) camposActualizados.caracteristicas = caracteristicas;
-      if (fechaInicio) camposActualizados.fechaInicio = fechaInicio;
-      if (fechaFin) camposActualizados.fechaFin = fechaFin;
-      if (numeroOrdenCompra) camposActualizados.numeroOrdenCompra = numeroOrdenCompra;
-      if (fechaAprobacionOrdenCompra) camposActualizados.fechaAprobacionOrdenCompra = fechaAprobacionOrdenCompra;
-      if (nombreCliente) camposActualizados.nombreCliente = nombreCliente;
-      if (ubicacion) camposActualizados.ubicacion = ubicacion;
-  
-      // Actualizar el servicio con los campos actualizados
-      const servicioActualizado = await Servicio.findByIdAndUpdate(req.params.id, camposActualizados, { new: true, runValidators: true });
-  
-      res.status(200).json(servicioActualizado);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
+  try {
+    const servicio = await Servicio.findById(req.params.id);
+
+    if (!servicio) {
+      return res.status(404).json({ message: 'Servicio no encontrado' });
     }
-  });
+
+    const {
+      nombre,
+      descripcion,
+      costoEstimado,
+      caracteristicas,
+      fechaInicio,
+      fechaFin,
+      numeroOrdenCompra,
+      fechaAprobacionOrdenCompra,
+      nombreCliente,
+      ubicacion,
+      estado // Incluir el nuevo campo en los datos del cuerpo de la solicitud
+    } = req.body;
+
+    // Crear un objeto con los campos a actualizar
+    const camposActualizados = {};
+    if (nombre) camposActualizados.nombre = nombre;
+    if (descripcion) camposActualizados.descripcion = descripcion;
+    if (costoEstimado) camposActualizados.costoEstimado = costoEstimado;
+    if (caracteristicas) camposActualizados.caracteristicas = caracteristicas;
+    if (fechaInicio) camposActualizados.fechaInicio = fechaInicio;
+    if (fechaFin) camposActualizados.fechaFin = fechaFin;
+    if (numeroOrdenCompra) camposActualizados.numeroOrdenCompra = numeroOrdenCompra;
+    if (fechaAprobacionOrdenCompra) camposActualizados.fechaAprobacionOrdenCompra = fechaAprobacionOrdenCompra;
+    if (nombreCliente) camposActualizados.nombreCliente = nombreCliente;
+    if (ubicacion) camposActualizados.ubicacion = ubicacion;
+    if (estado !== undefined) camposActualizados.estado = estado; // Actualizar el nuevo campo si se proporciona
+
+    // Verificar si el nuevo campo ya existe en el documento
+    if (!('estado' in servicio)) {
+      // Si el nuevo campo no existe, establecer su valor por defecto
+      camposActualizados.estado = estado !== undefined ? estado : true; // Valor por defecto true
+    }
+
+    // Actualizar el servicio con los campos actualizados
+    const servicioActualizado = await Servicio.findByIdAndUpdate(req.params.id, camposActualizados, { new: true, runValidators: true });
+
+    res.status(200).json(servicioActualizado);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 // @desc    Eliminar un servicio
 // @route   DELETE /api/servicios/:id
 // @access  Privado
