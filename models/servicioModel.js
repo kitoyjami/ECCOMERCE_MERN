@@ -82,6 +82,10 @@ const servicioSchema = new Schema({
   ubicacion: {
     type: String,
     trim: true
+  },
+  estado:{
+    type:Boolean,
+    default:true
   }
 }, {
   timestamps: true,
