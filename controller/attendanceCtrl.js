@@ -9,7 +9,7 @@ const attendanceModel = require('../models/attendanceModel');
 // Crear nueva asistencia
 const createAttendance = asyncHandler(async (req, res) => {
   try {
-    const { trabajador, servicio, horaEntrada, horaSalida } = req.body;
+    const { trabajador, servicio, horaEntrada, horaSalida,notas } = req.body;
 
     // Crear la nueva asistencia
     const attendance = new Attendance({ 
@@ -17,7 +17,8 @@ const createAttendance = asyncHandler(async (req, res) => {
       servicio,
       horaEntrada,
       horaSalida: horaSalida || null,
-      registradoPor: req.user._id
+      registradoPor: req.user._id,
+      notas: notas || ''
     });
     // Guardar la asistencia
     await attendance.save();
