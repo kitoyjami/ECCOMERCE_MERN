@@ -96,7 +96,7 @@ const createAttendance = asyncHandler(async (req, res) => {
 }); */
 
 
-const updateAttendance = asyncHandler(async (req, res) => {
+/* const updateAttendance = asyncHandler(async (req, res) => {
   try {
     const allowedFields = [
       'trabajador',
@@ -128,6 +128,78 @@ const updateAttendance = asyncHandler(async (req, res) => {
 
     // Si la asistencia no tiene hora de salida y se intenta modificar la hora de almuerzo, retornar error
     if (!attendance.horaSalida && !updates.horaAlmuerzo) {
+      return res.status(400).json({ message: 'No se puede modificar la hora de almuerzo si no se ha registrado la hora de salida' });
+    }
+
+    // Calcular la duración anterior
+    const duracionAnterior = attendance.duracionJornada;
+    let nuevaDuracion = duracionAnterior;
+
+    // Determinar si se debe descontar una hora de almuerzo
+    const horaAlmuerzoActual = updates.horaAlmuerzo !== undefined ? updates.horaAlmuerzo : attendance.horaAlmuerzo;
+    const horaAlmuerzoMinutes = horaAlmuerzoActual ? 60 : 0;
+
+    // Calcular la nueva duración si la hora de salida está presente o fue enviada
+    if (updates.horaSalida !== undefined || attendance.horaSalida) {
+      const finalHoraSalida = updates.horaSalida || attendance.horaSalida;
+      nuevaDuracion = ((new Date(finalHoraSalida) - new Date(updates.horaEntrada || attendance.horaEntrada)) / 1000 / 60) - horaAlmuerzoMinutes; // Duración en minutos
+    }
+
+    // Actualizar solo los campos proporcionados en el request
+    for (let key in updates) {
+      attendance[key] = updates[key];
+    }
+    attendance.duracionJornada = nuevaDuracion;
+
+    // Guardar la asistencia actualizada
+    await attendance.save();
+
+    // Si se proporcionó una hora de salida, actualizar el total de horas trabajadas en el servicio
+    if (updates.horaSalida !== undefined || attendance.horaSalida) {
+      const difference = nuevaDuracion - duracionAnterior;
+      await Servicio.findByIdAndUpdate(attendance.servicio, {
+        $inc: { totalHorasTrabajadas: difference }
+      });
+    }
+
+    res.status(200).json(attendance);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}); */
+
+const updateAttendance = asyncHandler(async (req, res) => {
+  try {
+    const allowedFields = [
+      'trabajador',
+      'servicio',
+      'horaEntrada',
+      'horaSalida',
+      'ubicacionEntrada',
+      'ubicacionSalida',
+      'estado',
+      'aprobado',
+      'notas',
+      'horaAlmuerzo'
+    ];
+
+    const updates = {};
+    for (const field of allowedFields) {
+      if (req.body.hasOwnProperty(field)) {
+        updates[field] = req.body[field];
+      }
+    }
+
+    const { id } = req.params;
+
+    // Encontrar la asistencia actual
+    const attendance = await Attendance.findById(id);
+    if (!attendance) {
+      return res.status(404).json({ message: 'Asistencia no encontrada' });
+    }
+
+    // Si se intenta modificar la hora de almuerzo sin registrar la hora de salida, retornar error
+    if (updates.hasOwnProperty('horaAlmuerzo') && !attendance.horaSalida && !updates.horaSalida) {
       return res.status(400).json({ message: 'No se puede modificar la hora de almuerzo si no se ha registrado la hora de salida' });
     }
 
