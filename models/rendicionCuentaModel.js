@@ -33,6 +33,11 @@ const DescripcionComprobanteSchema = new Schema({
         type: Schema.Types.ObjectId, 
         ref: 'Servicio', 
         required: true 
+    },
+    tipoGasto:{
+      type: Schema.Types.ObjectId, 
+        ref: 'TipoGasto', 
+        required: true 
     }
   });
   

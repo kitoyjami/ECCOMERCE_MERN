@@ -40,11 +40,11 @@ const createRendicionCuenta = async (req, res) => {
 const getAllRendicionesCuenta = async (req, res) => {
   try {
     const rendicionesCuenta = await RendicionCuenta.find()
-      .populate('proveedor')
-      .populate('descripcionComprobante.producto')
+      .populate('proveedor','rucDni nombreComercial nroContacto')
+      .populate('descripcionComprobante.producto','nombre marca tipo')
       .populate('descripcionComprobante.unidadMedida')
       .populate('descripcionComprobante.servicio')
-      .populate('registradoPor.user');
+      .populate('registradoPor.user','lasttname firstname email');
     res.json(rendicionesCuenta);
   } catch (error) {
     res.status(500).json({ message: error.message });
