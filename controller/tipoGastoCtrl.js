@@ -53,15 +53,15 @@ const updateTipoGasto = asyncHandler(async (req, res) => {
 
 // Eliminar un tipo de gasto por ID
 const deleteTipoGasto = asyncHandler(async (req, res) => {
-  const tipoGasto = await TipoGasto.findById(req.params.id);
-
-  if (!tipoGasto) {
-    res.status(404);
-    throw new Error('Tipo de gasto no encontrado');
-  }
-
-  await tipoGasto.remove();
-  res.status(200).json({ message: 'Tipo de gasto eliminado' });
+  try {
+    const tipoGasto = await TipoGasto.findByIdAndDelete(req.params.id);
+    if (!tipoGasto) {
+        return res.status(404).json({ message: 'Tipo de gasto no encontrado' });
+    }
+    res.json({ message: 'Tipo de gasto eliminado correctamente' });
+} catch (error) {
+    res.status(500).json({ message: error.message });
+}
 });
 
 module.exports = {
