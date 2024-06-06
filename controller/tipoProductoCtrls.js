@@ -35,60 +35,29 @@ const createTipoProducto = async (req, res) => {
 
 // Actualizar un tipo de producto
 const updateTipoProducto = async (req, res) => {
+
     try {
-      const tipoProducto = await TipoProducto.findById(req.params.id);
+      const tipoProducto = await TipoProducto.findByIdAndUpdate(req.params.id, req.body, { new: true });
       if (!tipoProducto) {
-        return res.status(404).json({ message: 'Tipo de producto no encontrado' });
+          return res.status(404).json({ message: 'Tipo Producto de medida no encontrado' });
       }
-  
-      const { title, caracteristica } = req.body;
-  
-      // Actualizar title si se proporciona
-      if (title) {
-        tipoProducto.title = title;
-      }
-  
-      // Agregar nueva característica si no existe
-      if (caracteristica) {
-        if (tipoProducto.caracteristica.includes(caracteristica)) {
-          return res.status(400).json({ message: 'La característica ya existe en el tipo de producto' });
-        }
-        tipoProducto.caracteristica.push(caracteristica);
-      }
-  
-      const tipoProductoActualizado = await tipoProducto.save();
-      res.json(tipoProductoActualizado);
-    } catch (error) {
+      res.json(tipoProducto);
+  } catch (error) {
       res.status(400).json({ message: error.message });
-    }
+  }
+
   };
 // Eliminar un tipo de producto o una subcategoría
 const deleteTipoProducto = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { caracteristica } = req.body;
-  
-      const tipoProducto = await TipoProducto.findById(id);
+       try {
+      const tipoProducto = await TipoProducto.findByIdAndDelete(req.params.id);
       if (!tipoProducto) {
-        return res.status(404).json({ message: 'Tipo de producto no encontrado' });
+          return res.status(404).json({ message: 'Tipo producto no encontrado' });
       }
-  
-      // Eliminar característica si se proporciona
-      if (caracteristica) {
-        if (!tipoProducto.caracteristica.includes(caracteristica)) {
-          return res.status(400).json({ message: 'La característica no existe en el tipo de producto' });
-        }
-        tipoProducto.caracteristica = tipoProducto.caracteristica.filter(carac => carac !== caracteristica);
-        await tipoProducto.save();
-        return res.json({ message: 'Característica eliminada correctamente' });
-      }
-  
-      // Si no se proporcionó ninguna característica, eliminar todo el tipo de producto
-      await TipoProducto.findByIdAndDelete(id);
       res.json({ message: 'Tipo de producto eliminado correctamente' });
-    } catch (error) {
+  } catch (error) {
       res.status(500).json({ message: error.message });
-    }
+  }
   };
 
 module.exports = {
