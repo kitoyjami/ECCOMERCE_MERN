@@ -43,8 +43,14 @@ var workerSchema = new mongoose.Schema({
     ],
     photoDni:[
         {
-            public_id:String,
-            url:String
+            public_id: {
+                type: String,
+                default: ''
+            },
+            url: {
+                type: String,
+                default: ''
+            }
         }
     ],
     position:{
