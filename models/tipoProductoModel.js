@@ -9,14 +9,11 @@ const TipoProductoSchema = new Schema({
   },
   title: {
     type: String, 
-    required: true,
-    unique: true
+    required: true
   },
-  subcategoria: 
-    {
-      type: String
-    }
-  , 
+  subcategoria: {
+    type: String
+  }, 
   caracteristica: [
     {
       type: String
@@ -25,5 +22,3 @@ const TipoProductoSchema = new Schema({
 });
 
 module.exports = mongoose.model('TipoProducto', TipoProductoSchema);
-
-  

@@ -60,10 +60,41 @@ const deleteTipoProducto = async (req, res) => {
   }
   };
 
+  const eliminarIndiceUnico = async (req, res) => {
+    const { nombreIndice } = req.body;
+  
+    if (!nombreIndice) {
+      return res.status(400).json({ message: 'El nombre del índice es requerido' });
+    }
+  
+    try {
+      // Lista todos los índices para asegurarte de que el índice existe
+      const indexes = await TipoProducto.collection.indexes();
+      console.log('Current indexes:', indexes);
+  
+      // Verifica si el índice existe
+      const indexExists = indexes.some(index => index.name === nombreIndice);
+      if (!indexExists) {
+        return res.status(404).json({ message: 'Índice no encontrado' });
+      }
+  
+      // Elimina el índice
+      await TipoProducto.collection.dropIndex(nombreIndice);
+      console.log('Índice eliminado:', nombreIndice);
+  
+      res.status(200).json({ message: 'Índice eliminado correctamente' });
+    } catch (error) {
+      console.error('Error eliminando índice:', error);
+      res.status(500).json({ message: 'Error eliminando índice', error });
+    }
+  };
+
+
 module.exports = {
   getAllTiposProducto,
   getTipoProductoById,
   createTipoProducto,
   updateTipoProducto,
-  deleteTipoProducto
+  deleteTipoProducto,
+  eliminarIndiceUnico
 };
