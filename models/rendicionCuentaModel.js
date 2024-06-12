@@ -2,55 +2,56 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const DescripcionComprobanteSchema = new Schema({
+  _id: { type: Schema.Types.ObjectId, auto: true }, // Identificador único para cada elemento
   producto: {
-    type: Schema.Types.ObjectId, 
-    ref: 'ProductoCrs', 
-    required: true 
+    type: Schema.Types.ObjectId,
+    ref: 'ProductoCrs',
+    required: true
   },
-  cantidad: { 
-    type: Number, 
+  cantidad: {
+    type: Number,
     required: true,
-    min: 0 
+    min: 0
   },
-  precioUnitario: { 
-    type: Number, 
-    required: true, 
-    min: 0 
+  precioUnitario: {
+    type: Number,
+    required: true,
+    min: 0
   },
-  unidadMedida: { 
-    type: Schema.Types.ObjectId, 
-    ref: 'UnidadMedida', 
-    required: true 
+  unidadMedida: {
+    type: Schema.Types.ObjectId,
+    ref: 'UnidadMedida',
+    required: true
   },
-  costoTotal: { 
-    type: Number, 
-    required: true, 
+  costoTotal: {
+    type: Number,
+    required: true,
     min: 0,
-    default: function() {
+    default: function () {
       return this.cantidad * this.precioUnitario;
     }
   },
-  servicio: { 
-    type: Schema.Types.ObjectId, 
-    ref: 'Servicio', 
-    required: true 
+  servicio: {
+    type: Schema.Types.ObjectId,
+    ref: 'Servicio',
+    required: true
   },
   tipoGasto: {
-    type: Schema.Types.ObjectId, 
-    ref: 'TipoGasto', 
-    required: true 
+    type: Schema.Types.ObjectId,
+    ref: 'TipoGasto',
+    required: true
   }
 });
 
 const RendicionCuentaSchema = new Schema({
-  fecha: { 
-    type: Date, 
-    required: true 
+  fecha: {
+    type: Date,
+    required: true
   },
-  tipoComprobante: { 
+  tipoComprobante: {
     type: String,
-    required: true, 
-    enum: ['Factura', 'Boleta', 'Sin comprobante'] 
+    required: true,
+    enum: ['Factura', 'Boleta', 'Sin comprobante']
   },
   nroComprobante: {
     type: String,
@@ -59,21 +60,21 @@ const RendicionCuentaSchema = new Schema({
   foto: {
     public_id: {
       type: String,
-      default: 'falta' // Establece aquí el valor predeterminado para 'public_id'
+      default: 'falta'
     },
     url: {
       type: String,
-      default: 'https://www.hotelbooqi.com/wp-content/uploads/2021/12/128-1280406_view-user-icon-png-user-circle-icon-png.png' // Establece aquí el valor predeterminado para 'url'
+      default: 'https://www.hotelbooqi.com/wp-content/uploads/2021/12/128-1280406_view-user-icon-png-user-circle-icon-png.png'
     }
   },
-  estado: { 
+  estado: {
     type: Boolean,
     default: true
   },
-  proveedor: { 
+  proveedor: {
     type: Schema.Types.ObjectId,
-    ref: 'Proveedor', 
-    required: true 
+    ref: 'Proveedor',
+    required: true
   },
   descripcionComprobante: [DescripcionComprobanteSchema],
   moneda: {
@@ -83,42 +84,42 @@ const RendicionCuentaSchema = new Schema({
   },
   tipoCambio: {
     type: Number,
-    required: function() { return this.moneda === 'Dolares'; },
+    required: function () { return this.moneda === 'Dolares'; },
     min: 0
   },
-  subTotal: { 
-    type: Number, 
-    required: true, 
-    min: 0,
-    default: 0 
-  },
-  agregarIGV: { 
-    type: Boolean, 
-    default: false
-  },
-  totalRendicion: { 
-    type: Number, 
+  subTotal: {
+    type: Number,
     required: true,
     min: 0,
-    default: function() { 
+    default: 0
+  },
+  agregarIGV: {
+    type: Boolean,
+    default: false
+  },
+  totalRendicion: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: function () {
       return this.agregarIGV ? this.subTotal * 1.18 : this.subTotal;
     }
   },
-  registradoPor: { 
+  registradoPor: {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true }
   },
-  fechaCreacion: { 
-    type: Date, 
-    default: Date.now 
+  fechaCreacion: {
+    type: Date,
+    default: Date.now
   },
-  fechaModificacion: { 
-    type: Date, 
-    default: Date.now 
+  fechaModificacion: {
+    type: Date,
+    default: Date.now
   }
 });
 
 // Middleware para calcular el costoTotal, subTotal y totalRendicion, y actualizar fecha de modificación
-RendicionCuentaSchema.pre('save', function(next) {
+RendicionCuentaSchema.pre('save', function (next) {
   this.fechaModificacion = Date.now();
   this.descripcionComprobante.forEach(item => {
     item.costoTotal = item.cantidad * item.precioUnitario;

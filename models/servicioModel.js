@@ -29,8 +29,16 @@ const servicioSchema = new Schema({
     ref: 'Attendance'
   }],
   registroGastos: [{
-    type: Schema.Types.ObjectId,
-    ref: 'RendicionCuenta'
+    producto: {
+      type: Schema.Types.ObjectId,
+      ref: 'ProductoCrs',
+      required: true
+    },
+    rendicionCuenta: {
+      type: Schema.Types.ObjectId,
+      ref: 'RendicionCuenta',
+      required: true
+    }
   }],
   totalGastado: {
     type: Number,

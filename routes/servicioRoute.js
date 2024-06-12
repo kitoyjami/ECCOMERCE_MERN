@@ -14,8 +14,8 @@ router.get('/:id',authMiddleware, getServicioById)
 router.get('/', getServicios);
 
 // Ruta para actualizar un reporte diario por fecha
-router.put('/:id',authMiddleware, updateServicio);
 //router.put('/actualizar-servicios',authMiddleware, actualizarServicios);
+router.put('/:id',authMiddleware, updateServicio);
 
 
 // Ruta para eliminar un reporte diario por fecha
