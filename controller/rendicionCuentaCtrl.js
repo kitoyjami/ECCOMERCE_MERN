@@ -3,39 +3,41 @@ const RendicionCuenta = require('../models/rendicionCuentaModel');
 const Servicio = require('../models/servicioModel');
 
 // Crear una nueva rendición de cuenta
-const createRendicionCuenta = asyncHandler(async (req, res) => {
-  const {
-    fecha,
-    tipoComprobante,
-    foto,
-    estado,
-    proveedor,
-    descripcionComprobante,
-    agregarIGV
-  } = req.body;
+const createRendicionCuenta = async (req, res) => {
+  try {
+    const {
+      fecha,
+      tipoComprobante,
+      foto,
+      estado,
+      proveedor,
+      descripcionComprobante,
+      agregarIGV,
+      nroComprobante,
+      moneda,
+      tipoCambio
+    } = req.body;
 
-  const nuevaRendicionCuenta = new RendicionCuenta({
-    fecha,
-    tipoComprobante,
-    foto,
-    estado,
-    proveedor,
-    descripcionComprobante,
-    agregarIGV,
-    registradoPor: { user: req.user._id }
-  });
+    const nuevaRendicionCuenta = new RendicionCuenta({
+      fecha,
+      tipoComprobante,
+      foto,
+      estado,
+      proveedor,
+      descripcionComprobante,
+      agregarIGV,
+      nroComprobante,
+      moneda,
+      tipoCambio,
+      registradoPor: { user: req.user._id }
+    });
 
-  await nuevaRendicionCuenta.save();
-
-  // Actualizar el registro de gastos en el servicio correspondiente
-  const serviciosIds = descripcionComprobante.map(desc => desc.servicio);
-  await Servicio.updateMany(
-    { _id: { $in: serviciosIds } },
-    { $push: { registroGastos: nuevaRendicionCuenta._id } }
-  );
-
-  res.status(201).json(nuevaRendicionCuenta);
-});
+    await nuevaRendicionCuenta.save();
+    res.status(201).json(nuevaRendicionCuenta);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 // Obtener todas las rendiciones de cuenta
 const getAllRendicionesCuenta = asyncHandler(async (req, res) => {
