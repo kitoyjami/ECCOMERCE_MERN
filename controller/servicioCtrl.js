@@ -307,4 +307,22 @@ const deleteServicio = asyncHandler(async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar el servicio' });
   }
 });
-module.exports = { getServicios, getServicioById, createServicio, updateServicio, deleteServicio };
+
+
+const actualizarServicios = asyncHandler( async (req, res) => {
+  try {
+    await Servicio.updateMany(
+      {}, // Filtro vacío para seleccionar todos los documentos
+      {
+        $set: {
+          // Aquí agregarías cualquier campo nuevo que necesite un valor por defecto, si fuera necesario.
+        }
+      }
+    );
+    res.status(200).json({ message: 'Actualización de servicios completada exitosamente.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar los servicios.', error });
+  }
+})
+
+module.exports = { getServicios, getServicioById, createServicio, updateServicio, deleteServicio, actualizarServicios };

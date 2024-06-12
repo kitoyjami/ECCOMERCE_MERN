@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 const servicioSchema = new Schema({
   nombre: {
@@ -30,7 +30,7 @@ const servicioSchema = new Schema({
   }],
   registroGastos: [{
     type: Schema.Types.ObjectId,
-    ref: 'Expense'
+    ref: 'RendicionCuenta'
   }],
   totalGastado: {
     type: Number,
@@ -45,7 +45,7 @@ const servicioSchema = new Schema({
   caracteristicas: [{
     tipo: {
       type: String,
-      enum: ['kg', 'metros', 'metros lineales', 'metros cuadrados','unidades'],
+      enum: ['kg', 'metros', 'metros lineales', 'metros cuadrados', 'unidades'],
       required: [true, 'El tipo de característica es obligatorio']
     },
     valor: {
@@ -83,9 +83,9 @@ const servicioSchema = new Schema({
     type: String,
     trim: true
   },
-  estado:{
-    type:Boolean,
-    default:true
+  estado: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true,
