@@ -4,31 +4,6 @@ const Servicio = require('../models/servicioModel');
 
 // Crear una nueva rendición de cuenta
 const createRendicionCuenta = asyncHandler(async (req, res) => {
-  const {
-    fecha,
-    tipoComprobante,
-    foto,
-    estado,
-    proveedor,
-    descripcionComprobante,
-    agregarIGV,
-    nroComprobante,
-    moneda,
-    tipoCambio  
-  } = req.body;
-
-  const nuevaRendicionCuenta = new RendicionCuenta({
-    fecha,
-    tipoComprobante,
-    foto,
-    estado,
-    proveedor,
-    descripcionComprobante,
-    agregarIGV,
-    registradoPor: { user: req.user._id }
-  });
-
-  await nuevaRendicionCuenta.save();
   try{
     const {
       fecha,
