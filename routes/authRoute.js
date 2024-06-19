@@ -20,7 +20,8 @@ const { createUser, loginUserCtlr,
     createOrder,
     getOrder,
     updateOrderStatus,
-    getAllOrder} 
+    getAllOrder,
+    verifyCurrentPassword} 
     = require('../controller/userCtrl')
 const router = express.Router()
 createUser
@@ -42,6 +43,7 @@ router.put('/cart/applycoupon',authMiddleware,applyCoupon)
 router.put('/order/update-order/:id',authMiddleware,updateOrderStatus)
 
 router.post('/cart/cash-order',authMiddleware,createOrder)
+router.post("/verify-current-password", authMiddleware, verifyCurrentPassword);
 router.get("/get-orders",authMiddleware,getOrder)
 router.get("/get-all-orders",authMiddleware,isAdmin,getAllOrder)
 
@@ -51,7 +53,7 @@ router.get("/wishlist/:id",authMiddleware,getWishList)
 
 
 router.delete("/:id",deleteaUser)
-router.put("/edit",authMiddleware,updateaUser)
+router.put("/edit",authMiddleware,updateaUser)|
 
 router.put("/save-address",authMiddleware,saveAddress)
 router.put("/password",authMiddleware,updatePassword)

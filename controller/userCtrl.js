@@ -547,6 +547,26 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     }
 });
 
+const verifyCurrentPassword = asyncHandler(async (req, res) => {
+    const { currentPassword } = req.body;
+    const { _id } = req.user;
+    validateMongoDbId(_id);
+
+    const user = await User.findById(_id);
+    if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+    }
+
+    const isMatch = await user.isPasswordMatched(currentPassword);
+    if (!isMatch) {
+        res.status(400).json({ message: 'Current password is incorrect' });
+        return;
+    }
+
+    res.status(200).json({ message: 'Current password is correct' });
+});
+
 
 module.exports = {
     createUser,
@@ -571,5 +591,6 @@ module.exports = {
     createOrder,
     getOrder,
     updateOrderStatus,
-    getAllOrder
+    getAllOrder,
+    verifyCurrentPassword
 }
