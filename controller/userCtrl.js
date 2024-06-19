@@ -233,7 +233,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
         const token = await user.createPasswordResetToken();
         await user.save();
 
-        const resetURL = `http://localhost:5173/reset-password/${token}`;
+        const resetURL = `http://crsleon.info/reset-password/${token}`;
         
         const emailTemplate = `
             <html>
