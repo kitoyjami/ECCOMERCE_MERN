@@ -221,31 +221,113 @@ const updatePassword = asyncHandler(async(req,res)=>{
     }
 })
 
-const forgotPasswordToken = asyncHandler(async (req,res)=>{
-    const {email}=req.body
-    const user = await User.findOne({email})
-    if(!user) throw new Error("User not found with this email")
-    try{
-        const token = await user.createPasswordResetToken()
-        await user.save()
-        const resetURL = `Hi, Please follor his link to reset Your Password.
-        This linkd is valid till 10 minutes from now. 
-        <a href='http://localhost:4000/api/user/reset-password/${token}'> Click Here</a>`
-        const data={
-            to: email,
-            text:"Hey User",
-            subject:"Forgot Password",
-            htm:resetURL
+const forgotPasswordToken = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
 
-            }
-            sendEmail(data)
-            res.json(token)
-        }
-        catch(error){
-            throw new Error(error)
-        }
+    if (!user) {
+        throw new Error("User not found with this email");
     }
-)
+
+    try {
+        const token = await user.createPasswordResetToken();
+        await user.save();
+
+        const resetURL = `http://localhost:5173/reset-password/${token}`;
+        
+        const emailTemplate = `
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                    }
+                    .email-container {
+                        background-color: #ffffff;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                        max-width: 600px;
+                        width: 100%;
+                        margin: 20px;
+                    }
+                    .email-header {
+                        background-color: #be0811;
+                        color: #ffffff;
+                        padding: 10px;
+                        border-radius: 8px 8px 0 0;
+                        text-align: center;
+                    }
+                    .email-body {
+                        padding: 20px;
+                        color: #333;
+                    }
+                    .email-footer {
+                        padding: 10px;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #888888;
+                    }
+                    .button {
+                        background-color: #be0811;
+                        color: #ffffff;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 5px;
+                        text-decoration: none;
+                        display: inline-block;
+                        margin: 20px 0;
+                        font-size: 16px;
+                        cursor: pointer;
+                    }
+                    .button:hover {
+                        background-color: #a10a0d;
+                    }
+                    a.button {
+                        color: #ffffff;
+                        text-decoration: none;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="email-container">
+                    <div class="email-header">
+                        <h2>Password Reset Request</h2>
+                    </div>
+                    <div class="email-body">
+                        <p>Dear User,</p>
+                        <p>You requested a password reset. Click the button below to reset your password:</p>
+                        <a href="${resetURL}" class="button">Reset Password</a>
+                        <p>If you did not request a password reset, please ignore this email.</p>
+                        <p>This link is valid for 10 minutes from now.</p>
+                    </div>
+                    <div class="email-footer">
+                        <p>&copy; 2023 Your Company. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+        const data = {
+            to: email,
+            subject: "Forgot Password",
+            text: "Hey User",
+            html: emailTemplate
+        };
+
+        await sendEmail(data);
+        res.json({ message: 'Reset password link sent to your email.' });
+    } catch (error) {
+        throw new Error(error);
+    }
+});
 
 const resetPassword =asyncHandler (async (req,res)=>{
     const {password} =req.body
