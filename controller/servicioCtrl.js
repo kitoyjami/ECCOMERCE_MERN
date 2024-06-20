@@ -198,16 +198,63 @@ const getServicios = asyncHandler(async (req, res) => {
 // @route   GET /api/servicios/:id
 // @access  Público
 const getServicioById = asyncHandler(async (req, res) => {
-  const servicio = await Servicio.findById(req.params.id);
+  try {
+    const servicio = await Servicio.findById(req.params.id).lean();
 
-  if (!servicio) {
-    res.status(404);
-    throw new Error('Servicio no encontrado');
+    if (!servicio) {
+      res.status(404);
+      throw new Error('Servicio no encontrado');
+    }
+
+    // Recuperar todas las asistencias asociadas a este servicio
+    const attendances = await Attendance.find({ servicio: servicio._id })
+      .populate({
+        path: 'trabajador',
+        select: 'firstname lasttname position'
+      })
+      .select('horaEntrada horaSalida horaAlmuerzo trabajador');
+
+    // Crear un array para almacenar los detalles de la asistencia
+    const attendanceDetails = attendances.map(attendance => {
+      let hoursWorked = 0;
+
+      if (attendance.horaSalida) {
+        // Calcular las horas trabajadas
+        hoursWorked = (attendance.horaSalida - attendance.horaEntrada) / (1000 * 60 * 60); // Convertir a horas
+
+        // Si el estado de horaAlmuerzo es verdadero, restar una hora de almuerzo
+        if (attendance.horaAlmuerzo !== undefined ? attendance.horaAlmuerzo : true) {
+          hoursWorked -= 1; // Restar una hora de almuerzo
+        }
+
+        // Asegurarse de que no sea un número negativo
+        if (hoursWorked < 0) {
+          hoursWorked = 0;
+        }
+      }
+
+      return {
+        trabajador: attendance.trabajador ? `${attendance.trabajador.firstname} ${attendance.trabajador.lasttname}` : "Trabajador no asignado",
+        position: attendance.trabajador ? attendance.trabajador.position : "N/A",
+        fecha: attendance.horaEntrada.toDateString(),
+        horaEntrada: attendance.horaEntrada,
+        horaSalida: attendance.horaSalida,
+        horasTrabajadas: hoursWorked
+      };
+    });
+
+    // Calcular el total de horas trabajadas
+    const totalHoursWorked = attendanceDetails.reduce((sum, attendance) => sum + attendance.horasTrabajadas, 0);
+
+    // Agregar los detalles de la asistencia y el total de horas trabajadas al objeto de servicio
+    servicio.asistenciaTrabajo = attendanceDetails;
+    servicio.totalHorasTrabajadas = totalHoursWorked;
+
+    res.status(200).json(servicio);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
-
-  res.json(servicio);
 });
-
 // @desc    Crear un nuevo servicio
 // @route   POST /api/servicios
 // @access  Privado
