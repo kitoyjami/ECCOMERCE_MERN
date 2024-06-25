@@ -46,7 +46,7 @@ const clienteSchema = new Schema({
   },
   historialPedidos: [{
     type: Schema.Types.ObjectId,
-    ref: 'OrdenServicio'
+    ref: 'OrdenDeServicio'
   }],
   notas: {
     type: String,
