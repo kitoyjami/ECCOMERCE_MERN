@@ -74,15 +74,19 @@ const updateCliente = asyncHandler(async (req, res) => {
 
 // Eliminar cliente
 const deleteCliente = asyncHandler(async (req, res) => {
-  const cliente = await Cliente.findById(req.params.id);
+  const cliente = await Cliente.findByIdAndDelete(req.params.id);
 
-  if (!cliente) {
-    res.status(404);
-    throw new Error('Cliente no encontrado');
+  try {
+    const cliente = await Cliente.findByIdAndDelete(req.params.id);
+
+    if (cliente) {
+      res.status(200).json({ message: 'Cliente eliminado' });
+    } else {
+      res.status(404).json({ message: 'Cliente no encontrado' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
-
-  await cliente.remove();
-  res.status(200).json({ message: 'Cliente eliminado' });
 });
 
 module.exports = {

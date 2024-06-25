@@ -14,9 +14,8 @@ const clienteSchema = new Schema({
     trim: true
   },
   estado: {
-    type: String,
-    enum: ['activo', 'inactivo'],
-    default: 'activo'
+    type: Boolean,
+    default: true
   },
   direccionEntrega: {
     type: String,
