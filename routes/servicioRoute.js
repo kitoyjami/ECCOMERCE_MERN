@@ -1,24 +1,13 @@
-const express = require("express")
-const { createServicio, getServicioById, getServicios, updateServicio, deleteServicio, actualizarServicios } = require("../controller/servicioCtrl")
-const { authMiddleware} = require("../middlewares/authMiddleware")
-const router = express.Router()
+const express = require("express");
+const { createServicio, getServicioById, getServicios, updateServicio, deleteServicio, actualizarServicios } = require("../controller/servicioCtrl");
+const { authMiddleware } = require("../middlewares/authMiddleware");
+const router = express.Router();
 
-
-// Ruta para crear un nuevo reporte diario
-router.post('/',authMiddleware, createServicio);
-
-// Ruta para obtener un reporte diario por fecha
-router.get('/:id',authMiddleware, getServicioById)
-
-// Ruta para obtener todos los reportes diarios
+router.post('/', authMiddleware, createServicio);
+router.get('/:id', authMiddleware, getServicioById);
 router.get('/', getServicios);
+router.put('/actualizar-todos/:supervisorId', authMiddleware, actualizarServicios);
+router.put('/:id', authMiddleware, updateServicio);
+router.delete('/:id', authMiddleware, deleteServicio);
 
-// Ruta para actualizar un reporte diario por fecha
-//router.put('/actualizar-servicios',authMiddleware, actualizarServicios);
-router.put('/:id',authMiddleware, updateServicio);
-
-
-// Ruta para eliminar un reporte diario por fecha
-router.delete('/:id',authMiddleware, deleteServicio);
-
-module.exports=router
+module.exports = router;
