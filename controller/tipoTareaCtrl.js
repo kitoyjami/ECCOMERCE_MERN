@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const TipoTarea = require('../models/tipoProductoModel');
+const TipoTarea = require('../models/tipoTareaModel');
 
 // @desc    Crear un nuevo tipo de tarea
 // @route   POST /api/tipo-tarea

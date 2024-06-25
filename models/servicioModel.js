@@ -90,11 +90,11 @@ const servicioSchema = new Schema({
       min: [0, 'El valor de la característica no puede ser negativo']
     }
   }],
-  supervisorAsignado: {
+  supervisoresAsignados: [{
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  },
+  }],
   asistenciaTrabajo: [{
     type: Schema.Types.ObjectId,
     ref: 'Attendance'
@@ -184,3 +184,4 @@ servicioSchema.pre('save', async function(next) {
 servicioSchema.index({ nombre: 1 });
 
 module.exports = mongoose.model('Servicio', servicioSchema);
+

@@ -79,7 +79,9 @@ app.use("/api/servicio",servicioRouter)
 app.use("/api/unidades",unidadesRouter)
 app.use("/api/tipo-producto",tipoProductoRouter)
 app.use("/api/tipo-gasto",tipoGastoRouter)
+
 app.use('/api/tipo-tarea', tipoTareaRouter);
+
 app.use("/api/productocrs",productoCrsRouter)
 app.use("/api/proveedores",proveedoresRouter)
 app.use("/api/rendicion-cuenta",rendicionCuentaRouter)
