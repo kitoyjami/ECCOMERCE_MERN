@@ -22,6 +22,7 @@ const unidadesRouter = require("./routes/unidadesRoute")
 const tipoProductoRouter = require("./routes/tipoProductoRoute")
 const rendicionCuentaRouter = require("./routes/rendicionCuentaRoute")
 const tipoGastoRouter = require("./routes/tipoGastoRoute")
+const ordenDeServicioRouter = require('./routes/ordenDeServicioRoute');
 
 const tipoTareaRouter = require('./routes/tipoTareaRoute')
 
@@ -82,6 +83,7 @@ app.use('/api/tipo-tarea', tipoTareaRouter);
 app.use("/api/productocrs",productoCrsRouter)
 app.use("/api/proveedores",proveedoresRouter)
 app.use("/api/rendicion-cuenta",rendicionCuentaRouter)
+app.use("/api/orden-servicio", ordenDeServicioRouter);
 
 
 app.use(notFound)
