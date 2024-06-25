@@ -68,4 +68,10 @@ clienteSchema.methods.agregarOrdenServicio = function(ordenId) {
   return this.save();
 };
 
+// Método para eliminar una orden de servicio del historial del cliente
+clienteSchema.methods.eliminarOrdenServicio = function(ordenId) {
+  this.historialPedidos.pull(ordenId);
+  return this.save();
+};
+
 module.exports = mongoose.model('Cliente', clienteSchema);

@@ -22,9 +22,15 @@ const createOrdenDeServicio = asyncHandler(async (req, res) => {
   });
 
   const createdOrdenDeServicio = await ordenDeServicio.save();
+
+  // Agregar la orden de servicio al historial del cliente
+  const clienteDoc = await Cliente.findById(cliente);
+  if (clienteDoc) {
+    await clienteDoc.agregarOrdenServicio(createdOrdenDeServicio._id);
+  }
+
   res.status(201).json(createdOrdenDeServicio);
 });
-
 // Obtener todas las ordenes de servicio
 const getOrdenesDeServicio = asyncHandler(async (req, res) => {
   const ordenes = await OrdenDeServicio.find()
@@ -74,19 +80,24 @@ const updateOrdenDeServicio = asyncHandler(async (req, res) => {
 
 // Eliminar una orden de servicio
 const deleteOrdenDeServicio = asyncHandler(async (req, res) => {
-    try {
-      const orden = await OrdenDeServicio.findByIdAndDelete(req.params.id);
-  
-      if (orden) {
-        res.status(200).json({ message: 'Orden de servicio eliminada' });
-      } else {
-        res.status(404).json({ message: 'Orden de servicio no encontrada' });
-      }
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  });
+  try {
+    const orden = await OrdenDeServicio.findByIdAndDelete(req.params.id);
 
+    if (orden) {
+      // Remover la orden de servicio del historial del cliente
+      const cliente = await Cliente.findById(orden.cliente);
+      if (cliente) {
+        await cliente.eliminarOrdenServicio(orden._id);
+      }
+
+      res.status(200).json({ message: 'Orden de servicio eliminada' });
+    } else {
+      res.status(404).json({ message: 'Orden de servicio no encontrada' });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 module.exports = {
   createOrdenDeServicio,
   getOrdenesDeServicio,
