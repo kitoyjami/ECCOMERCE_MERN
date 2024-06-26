@@ -12,6 +12,11 @@ const attendanceSchema = new Schema({
     ref: 'Servicio',
     required: true
   },
+  tarea: {
+    type: Schema.Types.ObjectId,
+    ref: 'Servicio.tareas', // Referencia a la tarea dentro del servicio
+    required: false // Puede no ser requerido si la asistencia no está asociada a una tarea específica
+  },
   horaEntrada: {
     type: Date,
     required: true
@@ -53,7 +58,7 @@ const attendanceSchema = new Schema({
   },
   duracionJornada: {
     type: Number, // Duración en minutos u horas
-    default:0
+    default: 0
   },
   tipoJornada: {
     type: String,
