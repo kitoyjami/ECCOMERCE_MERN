@@ -75,9 +75,10 @@ const updateAttendance = asyncHandler(async (req, res) => {
     }
 
     const { id } = req.params;
-
+   
     // Encontrar la asistencia actual
     const attendance = await Attendance.findById(id);
+    console.log("Hola" + id)
     if (!attendance) {
       return res.status(404).json({ message: 'Asistencia no encontrada' });
     }

@@ -21,11 +21,11 @@ router.get('/', authMiddleware, getAttendances);
 router.get('/:id', authMiddleware, getAttendanceById);
 
 // Actualizar una asistencia existente
+router.put('/:id', authMiddleware, updateAttendance);
 router.put('/actualizar-todas', authMiddleware, actualizarAsistencias);
-router.put('/:id', authMiddleware, actualizarAsistencias);
 
 // Eliminar una asistencia existente
-router.delete('/:id', authMiddleware, updateAttendance);
+router.delete('/:id', authMiddleware, deleteAttendance);
 
 // Actualizar todas las asistencias existentes con nuevos campos
 
