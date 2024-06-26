@@ -152,6 +152,7 @@ const updateServicio = asyncHandler(async (req, res) => {
     if (!servicio) {
       return res.status(404).json({ message: 'Servicio no encontrado' });
     }
+
     const {
       nombre,
       descripcion,
@@ -168,31 +169,45 @@ const updateServicio = asyncHandler(async (req, res) => {
       supervisoresAsignados,
       estado
     } = req.body;
-    const camposActualizados = {};
-    if (nombre) camposActualizados.nombre = nombre;
-    if (descripcion) camposActualizados.descripcion = descripcion;
-    if (costoEstimado) camposActualizados.costoEstimado = costoEstimado;
-    if (horasHombreProyectadas) camposActualizados.horasHombreProyectadas = horasHombreProyectadas;
-    if (caracteristicas) camposActualizados.caracteristicas = caracteristicas;
-    if (fechaInicio) camposActualizados.fechaInicio = fechaInicio;
-    if (fechaFin) camposActualizados.fechaFin = fechaFin;
-    if (numeroOrdenCompra) camposActualizados.numeroOrdenCompra = numeroOrdenCompra;
-    if (fechaAprobacionOrdenCompra) camposActualizados.fechaAprobacionOrdenCompra = fechaAprobacionOrdenCompra;
-    if (nombreCliente) camposActualizados.nombreCliente = nombreCliente;
-    if (ubicacion) camposActualizados.ubicacion = ubicacion;
-    if (tareas) camposActualizados.tareas = tareas;
-    if (supervisoresAsignados) camposActualizados.supervisoresAsignados = supervisoresAsignados;
-    if (estado !== undefined) camposActualizados.estado = estado;
-    if (!('estado' in servicio)) {
-      camposActualizados.estado = estado !== undefined ? estado : true;
+
+    const camposActualizados = {
+      nombre,
+      descripcion,
+      costoEstimado,
+      horasHombreProyectadas,
+      fechaInicio,
+      fechaFin,
+      numeroOrdenCompra,
+      fechaAprobacionOrdenCompra,
+      nombreCliente,
+      ubicacion,
+      supervisoresAsignados,
+      estado
+    };
+
+    for (const key in camposActualizados) {
+      if (camposActualizados[key] !== undefined) {
+        servicio[key] = camposActualizados[key];
+      }
     }
-    const servicioActualizado = await Servicio.findByIdAndUpdate(req.params.id, camposActualizados, { new: true, runValidators: true });
-    res.status(200).json(servicioActualizado);
+
+    if (tareas) {
+      servicio.tareas = tareas.map(t => ({
+        _id: t._id || new mongoose.Types.ObjectId(),
+        ...t
+      }));
+    }
+
+    if (caracteristicas) {
+      servicio.caracteristicas = caracteristicas;
+    }
+
+    await servicio.save();
+    res.status(200).json(servicio);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
-
 // @desc    Eliminar un servicio
 // @route   DELETE /api/servicios/:id
 // @access  Privado

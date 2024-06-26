@@ -6,8 +6,8 @@ const router = express.Router();
 router.post('/', authMiddleware, createServicio);
 router.get('/:id', authMiddleware, getServicioById);
 router.get('/', getServicios);
-router.put('/actualizar-todos/:supervisorId', authMiddleware, actualizarServicios);
 router.put('/:id', authMiddleware, updateServicio);
+router.put('/actualizar-todos/:supervisorId', authMiddleware, actualizarServicios);
 router.delete('/:id', authMiddleware, deleteServicio);
 
 module.exports = router;

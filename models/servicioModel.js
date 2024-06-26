@@ -1,6 +1,58 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const caracteristicaSchema = new Schema({
+  unidadMedida: {
+    type: Schema.Types.ObjectId,
+    ref: 'UnidadMedida',
+    required: [true, 'La unidad de medida es obligatoria']
+  },
+  cantidad: {
+    type: Number,
+    required: [true, 'La cantidad es obligatoria'],
+    min: [0, 'La cantidad no puede ser negativa']
+  }
+});
+
+const tareaSchema = new Schema({
+  nombre: {
+    type: String,
+    required: [true, 'El nombre de la tarea es obligatorio']
+  },
+  fechaInicio: {
+    type: Date,
+    required: [true, 'La fecha de inicio de la tarea es obligatoria']
+  },
+  fechaFin: {
+    type: Date,
+    validate: {
+      validator: function(value) {
+        return !value || value >= this.fechaInicio;
+      },
+      message: 'La fecha de fin debe ser posterior o igual a la fecha de inicio'
+    }
+  },
+  tipoTarea: {
+    type: Schema.Types.ObjectId,
+    ref: 'TipoTarea',
+    required: true
+  },
+  horasMaquina: {
+    type: Number,
+    min: [0, 'Las horas de máquina no pueden ser negativas']
+  },
+  asistenciaTrabajo: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Attendance'
+  }],
+  totalHorasHombre: {
+    type: Number,
+    default: 0,
+    min: [0, 'El total de horas hombre no puede ser negativo']
+  },
+  caracteristicas: [caracteristicaSchema]
+});
+
 const servicioSchema = new Schema({
   nombre: {
     type: String,
@@ -29,67 +81,8 @@ const servicioSchema = new Schema({
     default: 0,
     min: [0, 'El total de horas trabajadas no puede ser negativo']
   },
-  tareas: [{
-    nombre: {
-      type: String,
-      required: [true, 'El nombre de la tarea es obligatorio']
-    },
-    fechaInicio: {
-      type: Date,
-      required: [true, 'La fecha de inicio de la tarea es obligatoria']
-    },
-    fechaFin: {
-      type: Date,
-      validate: {
-        validator: function(value) {
-          return !value || value >= this.fechaInicio;
-        },
-        message: 'La fecha de fin debe ser posterior o igual a la fecha de inicio'
-      }
-    },
-    tipoTarea: {
-      type: Schema.Types.ObjectId,
-      ref: 'TipoTarea',
-      required: true
-    },
-    horasMaquina: {
-      type: Number,
-      min: [0, 'Las horas de máquina no pueden ser negativas']
-    },
-    asistenciaTrabajo: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Attendance'
-    }],
-    totalHorasHombre: {
-      type: Number,
-      default: 0,
-      min: [0, 'El total de horas hombre no puede ser negativo']
-    },
-    caracteristicas: [{
-      unidadMedida: {
-        type: Schema.Types.ObjectId,
-        ref: 'UnidadMedida',
-        required: [true, 'La unidad de medida es obligatoria']
-      },
-      cantidad: {
-        type: Number,
-        required: [true, 'La cantidad es obligatoria'],
-        min: [0, 'La cantidad no puede ser negativa']
-      }
-    }]
-  }],
-  caracteristicas: [{
-    tipo: {
-      type: String,
-      enum: ['kg', 'metros', 'metros lineales', 'metros cuadrados', 'unidades'],
-      required: [true, 'El tipo de característica es obligatorio']
-    },
-    valor: {
-      type: Number,
-      required: [true, 'El valor de la característica es obligatorio'],
-      min: [0, 'El valor de la característica no puede ser negativo']
-    }
-  }],
+  tareas: [tareaSchema],
+  caracteristicas: [caracteristicaSchema],
   supervisoresAsignados: [{
     type: Schema.Types.ObjectId,
     ref: 'User',
