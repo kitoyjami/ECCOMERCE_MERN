@@ -226,7 +226,7 @@ const actualizarAsistencias = asyncHandler(async (req, res) => {
   try {
     const updates = {
       $set: {
-        tareas: null
+        tarea: null
       }
     };
 
