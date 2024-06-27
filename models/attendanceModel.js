@@ -14,7 +14,7 @@ const attendanceSchema = new Schema({
   },
   tarea: {
     type: Schema.Types.ObjectId,
-    ref: 'Servicio.tareas', // Referencia a la tarea dentro del servicio
+    ref: 'Servicio', // Referencia a la tarea dentro del servicio
     required: false // Puede no ser requerido si la asistencia no está asociada a una tarea específica
   },
   horaEntrada: {

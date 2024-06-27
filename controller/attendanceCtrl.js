@@ -9,7 +9,7 @@ const createAttendance = asyncHandler(async (req, res) => {
     const { trabajador, servicio, tarea, horaEntrada, horaSalida, notas } = req.body;
 
     // Crear la nueva asistencia
-    const attendance = new Attendance({ 
+    const attendance = new Attendance({
       trabajador,
       servicio,
       tarea,
@@ -75,10 +75,10 @@ const updateAttendance = asyncHandler(async (req, res) => {
     }
 
     const { id } = req.params;
-   
+
     // Encontrar la asistencia actual
     const attendance = await Attendance.findById(id);
-    console.log("Hola" + id)
+    let bandera1 = attendance.tarea
     if (!attendance) {
       return res.status(404).json({ message: 'Asistencia no encontrada' });
     }
@@ -119,6 +119,41 @@ const updateAttendance = asyncHandler(async (req, res) => {
       });
     }
 
+
+    // Nueva funcionalidad: Si se proporcionó una tarea, actualizar el campo asistenciaTrabajo de la tarea
+    if (updates.tarea) {
+      console.log("Tarea proporcionada:", updates.tarea, "tarea anterior:", bandera1);
+
+      // Si la tarea cambió, eliminar de la tarea anterior y agregar a la nueva
+      if (bandera1 && bandera1.toString() !== updates.tarea) {
+        console.log("Tarea cambiada de", bandera1, "a", updates.tarea);
+
+        // Eliminar de la tarea anterior
+        const oldTask = await Servicio.findOneAndUpdate(
+          { "_id": attendance.servicio, "tareas._id": bandera1 },
+          { $pull: { "tareas.$.asistenciaTrabajo": attendance._id } }
+        );
+        console.log("Eliminado de la tarea anterior:", oldTask);
+
+        // Agregar a la nueva tarea
+        const newTaskUpdate = await Servicio.findOneAndUpdate(
+          { "_id": attendance.servicio, "tareas._id": updates.tarea },
+          { $addToSet: { "tareas.$.asistenciaTrabajo": attendance._id } },
+          { new: true } // Asegurarse de obtener el documento actualizado
+        );
+        console.log("Agregado a la nueva tarea:", newTaskUpdate);
+      } else if (!bandera1) {
+        console.log("No había tarea antes, agregando a la nueva tarea");
+
+        // Si no había tarea antes, simplemente agregar a la nueva tarea
+        const newTaskAddition = await Servicio.findOneAndUpdate(
+          { "_id": attendance.servicio, "tareas._id": updates.tarea },
+          { $addToSet: { "tareas.$.asistenciaTrabajo": attendance._id } },
+          { new: true } // Asegurarse de obtener el documento actualizado
+        );
+        console.log("Agregado a la nueva tarea:", newTaskAddition);
+      }
+    }
     res.status(200).json(attendance);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -179,9 +214,20 @@ const getAttendances = asyncHandler(async (req, res) => {
       sortOption.horaEntrada = 1;
     }
 
-    const attendances = await Attendance.find(filter)
-      .populate('trabajador servicio registradoPor')
-      .sort(sortOption);
+    let attendances = await Attendance.find(filter)
+    .populate('trabajador servicio registradoPor')
+    .sort(sortOption);
+
+  // Popular manualmente el campo `tarea`
+  for (let attendance of attendances) {
+    if (attendance.tarea) {
+      const servicio = await Servicio.findById(attendance.servicio);
+      if (servicio) {
+        const tarea = servicio.tareas.id(attendance.tarea);
+        attendance._doc.tarea = tarea; // Asignar la tarea al campo tarea en attendance
+      }
+    }
+  }
 
     res.json(attendances);
   } catch (error) {
@@ -216,6 +262,14 @@ const deleteAttendance = asyncHandler(async (req, res) => {
       $pull: { asistenciaTrabajo: attendance._id },
       $inc: { totalHorasTrabajadas: -duracionJornada }
     });
+
+     // Actualizar la tarea dentro del servicio
+     if (attendance.tarea) {
+      await Servicio.findOneAndUpdate(
+        { "_id": attendance.servicio, "tareas._id": attendance.tarea },
+        { $pull: { "tareas.$.asistenciaTrabajo": attendance._id } }
+      );
+    }
 
     res.status(200).json({ message: 'Asistencia eliminada correctamente' });
   } catch (error) {
