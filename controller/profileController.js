@@ -25,40 +25,33 @@ const createProfile = asyncHandler(async (req, res) => {
 
 // Obtener todos los perfiles (con filtros y paginación)
 const getAllProfiles = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 100, fields, subtypename, ...filters } = req.query;
+    const { subtypename, tablename, fields, limit = 100, page = 1 } = req.query;
 
-    let query = {};
-
-    // Aplicar filtros
-    for (const key in filters) {
-        if (filters[key]) {
-            query[key] = filters[key];
-        }
-    }
-
-    // Filtrar por SubTypeName
+    // Construir el filtro de consulta
+    const query = {};
     if (subtypename) {
-        const subType = await ProfileSubtype.findOne({ SubtypeName: subtypename }).select('_id');
-        if (subType) {
-            query.SubTypeName = subType._id;
+        const subtype = await ProfileSubtype.findOne({ SubtypeName: subtypename });
+        if (subtype) {
+            query.SubTypeName = subtype._id;
         } else {
-            // Si no se encuentra el subtipo, devolver vacío
-            return res.status(200).json({
-                profiles: [],
-                totalPages: 0,
-                currentPage: page
-            });
+            return res.status(404).json({ message: "SubtypeName not found" });
         }
     }
 
-    // Seleccionar campos específicos
-    let selectedFields = '';
-    if (fields) {
-        selectedFields = fields.split(',').join(' ');
+    if (tablename) {
+        const table = await ProfileMasterTable.findOne({ TableName: tablename });
+        if (table) {
+            query.TableName = table._id;
+        } else {
+            return res.status(404).json({ message: "TableName not found" });
+        }
     }
 
-    // Construir la consulta
-    const profilesQuery = Profile.find(query)
+    // Construir la selección de campos
+    const selectedFields = fields ? fields.split(',').join(' ') : '';
+
+    // Obtener los perfiles con paginación, filtros y selección de campos
+    const profiles = await Profile.find(query)
         .select(selectedFields)
         .populate({
             path: 'TableName',
@@ -69,20 +62,20 @@ const getAllProfiles = asyncHandler(async (req, res) => {
                 select: 'SubtypeName'
             }
         })
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
+        .limit(Number(limit))
+        .skip((Number(page) - 1) * Number(limit))
+        .exec();
 
-    const profiles = await profilesQuery.exec();
+    // Obtener el total de documentos para la paginación
+    const totalDocuments = await Profile.countDocuments(query);
 
-    // Obtener el conteo total de documentos
-    const count = await Profile.countDocuments(query);
-
-    res.status(200).json({
+    res.json({
         profiles,
-        totalPages: Math.ceil(count / limit),
-        currentPage: page
+        totalPages: Math.ceil(totalDocuments / limit),
+        currentPage: Number(page)
     });
 });
+
 // Obtener un perfil por ID
 const getProfileById = asyncHandler(async (req, res) => {
     const profile = await Profile.findById(req.params.id)
