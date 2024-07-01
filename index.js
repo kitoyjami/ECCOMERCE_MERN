@@ -25,11 +25,14 @@ const tipoGastoRouter = require("./routes/tipoGastoRoute")
 const ordenDeServicioRouter = require('./routes/ordenDeServicioRoute');
 
 const tipoTareaRouter = require('./routes/tipoTareaRoute')
+const profileRouter = require('./routes/profileRoutes'); // Importa las nuevas rutas
 
 const productoCrsRouter = require("./routes/productCrsRoute")
 const proveedoresRouter = require("./routes/proveedorRoute")
 const clienteRouter= require('./routes/clienteRoute')
+const profileMasterTableRouter = require('./routes/profileMasterTableRoutes');
 
+const perfilesRoute = require('./routes/profileSubtypeRoutes');
 
 const bcategoryRouter = require("./routes/blogCatRoute")
 const wcategoryRouter = require("./routes/wcateRoute")
@@ -84,6 +87,9 @@ app.use("/api/tipo-gasto",tipoGastoRouter)
 
 app.use('/api/tipo-tarea', tipoTareaRouter);
 app.use('/api/cliente', clienteRouter);
+app.use('/api/perfilsubtype',perfilesRoute)
+app.use('/api/profile-master-tables', profileMasterTableRouter);
+app.use('/api/profile', profileRouter); // Usa las nuevas rutas
 
 app.use("/api/productocrs",productoCrsRouter)
 app.use("/api/proveedores",proveedoresRouter)
