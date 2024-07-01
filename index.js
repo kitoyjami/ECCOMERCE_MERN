@@ -32,6 +32,12 @@ const proveedoresRouter = require("./routes/proveedorRoute")
 const clienteRouter= require('./routes/clienteRoute')
 const profileMasterTableRouter = require('./routes/profileMasterTableRoutes');
 
+const tipoProductoRoutes = require('./routes/Logistica/tipoProductoRoutes');
+const categoriaProductoRoutes = require('./routes/Logistica/categoriaProductoRoutes');
+const subcategoriaProductoRoutes = require('./routes/Logistica/subcategoriaProductoRoutes');
+const productoRoutes = require('./routes/Logistica/productoRoutes');
+
+
 const perfilesRoute = require('./routes/profileSubtypeRoutes');
 
 const bcategoryRouter = require("./routes/blogCatRoute")
@@ -95,6 +101,11 @@ app.use("/api/productocrs",productoCrsRouter)
 app.use("/api/proveedores",proveedoresRouter)
 app.use("/api/rendicion-cuenta",rendicionCuentaRouter)
 app.use("/api/orden-servicio", ordenDeServicioRouter);
+
+app.use('/api/tipos', tipoProductoRoutes);
+app.use('/api/categorias', categoriaProductoRoutes);
+app.use('/api/subcategorias', subcategoriaProductoRoutes);
+app.use('/api/productos', productoRoutes);
 
 
 app.use(notFound)
