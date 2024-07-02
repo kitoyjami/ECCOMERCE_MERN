@@ -37,7 +37,7 @@ const getSubcategoriaProducto = asyncHandler(async (req, res) => {
     const { id } = req.params;
     validateMongoDbId(id);
     try {
-        const subcategoriaProducto = await SubcategoriaProducto.findById(id);
+        const subcategoriaProducto = await SubcategoriaProducto.findById(id).populate('categoria');
         res.json(subcategoriaProducto);
     } catch (error) {
         throw new Error(error);
@@ -46,7 +46,7 @@ const getSubcategoriaProducto = asyncHandler(async (req, res) => {
 
 const getAllSubcategoriasProducto = asyncHandler(async (req, res) => {
     try {
-        const subcategoriasProducto = await SubcategoriaProducto.find();
+        const subcategoriasProducto = await SubcategoriaProducto.find().populate('categoria');
         res.json(subcategoriasProducto);
     } catch (error) {
         throw new Error(error);

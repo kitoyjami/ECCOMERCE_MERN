@@ -14,11 +14,23 @@ const createTipoProducto = asyncHandler(async (req, res) => {
 const updateTipoProducto = asyncHandler(async (req, res) => {
     const { id } = req.params;
     validateMongoDbId(id);
+
     try {
-        const updatedTipoProducto = await TipoProducto.findByIdAndUpdate(id, req.body, { new: true });
-        res.json(updatedTipoProducto);
+        const tipoProducto = await TipoProducto.findById(id);
+        if (!tipoProducto) {
+            res.status(404);
+            throw new Error("Tipo de Producto no encontrado");
+        }
+
+        const updatedTipoProducto = await TipoProducto.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+
+        res.json({
+            message: "Tipo de Producto actualizado correctamente",
+            data: updatedTipoProducto
+        });
     } catch (error) {
-        throw new Error(error);
+        res.status(500);
+        throw new Error(`Error al actualizar el Tipo de Producto: ${error.message}`);
     }
 });
 

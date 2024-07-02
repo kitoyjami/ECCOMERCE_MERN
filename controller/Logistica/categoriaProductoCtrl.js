@@ -37,7 +37,7 @@ const getCategoriaProducto = asyncHandler(async (req, res) => {
     const { id } = req.params;
     validateMongoDbId(id);
     try {
-        const categoriaProducto = await CategoriaProducto.findById(id);
+        const categoriaProducto = await CategoriaProducto.findById(id).populate('tipo');
         res.json(categoriaProducto);
     } catch (error) {
         throw new Error(error);
@@ -46,7 +46,7 @@ const getCategoriaProducto = asyncHandler(async (req, res) => {
 
 const getAllCategoriasProducto = asyncHandler(async (req, res) => {
     try {
-        const categoriasProducto = await CategoriaProducto.find();
+        const categoriasProducto = await CategoriaProducto.find().populate('tipo');
         res.json(categoriasProducto);
     } catch (error) {
         throw new Error(error);
