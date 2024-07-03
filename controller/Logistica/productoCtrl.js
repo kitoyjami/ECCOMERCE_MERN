@@ -46,8 +46,26 @@ const getProducto = asyncHandler(async (req, res) => {
 
 const getAllProductos = asyncHandler(async (req, res) => {
     try {
-        const productos = await Producto.find().populate('tipo categoria subcategoria unidadesMedida');
-        res.json(productos);
+        const { page = 1, limit = 20, tipo, categoria, subcategoria } = req.query;
+
+        const query = {};
+        if (tipo) query.tipo = tipo;
+        if (categoria) query.categoria = categoria;
+        if (subcategoria) query.subcategoria = subcategoria;
+
+        const productos = await Producto.find(query)
+            .populate('tipo categoria subcategoria unidadesMedida')
+            .skip((page - 1) * limit)
+            .limit(Number(limit));
+
+        const total = await Producto.countDocuments(query);
+
+        res.json({
+            productos,
+            total,
+            page: Number(page),
+            pages: Math.ceil(total / limit),
+        });
     } catch (error) {
         throw new Error(error);
     }

@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const categoriaProductoSchema = new mongoose.Schema(
     {
-    nombre: String, // e.g., 'Materia Prima', 'Servicios profesionales'
+    nombre: String,
+    descripcion:String,
     tipo: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'TipoDProducto' 
