@@ -1,47 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-
-const DescripcionComprobanteSchema = new Schema({
-  _id: { type: Schema.Types.ObjectId, auto: true }, // Identificador único para cada elemento
-  producto: {
-    type: Schema.Types.ObjectId,
-    ref: 'ProductoCrs',
-    required: true
-  },
-  cantidad: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  precioUnitario: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  unidadMedida: {
-    type: Schema.Types.ObjectId,
-    ref: 'UnidadMedida',
-    required: true
-  },
-  costoTotal: {
-    type: Number,
-    required: true,
-    min: 0,
-    default: function () {
-      return this.cantidad * this.precioUnitario;
-    }
-  },
-  servicio: {
-    type: Schema.Types.ObjectId,
-    ref: 'Servicio',
-    required: true
-  },
-  tipoGasto: {
-    type: Schema.Types.ObjectId,
-    ref: 'TipoGasto',
-    required: true
-  }
-});
+const DescripcionComprobante = require('./DescripcionComprobante');
 
 const RendicionCuentaSchema = new Schema({
   fecha: {
@@ -76,7 +35,11 @@ const RendicionCuentaSchema = new Schema({
     ref: 'Proveedor',
     required: true
   },
-  descripcionComprobante: [DescripcionComprobanteSchema],
+  descripcionComprobante: [{
+    type: Schema.Types.ObjectId,
+    ref: 'DescripcionComprobante',
+    required: true
+  }],
   moneda: {
     type: String,
     required: true,
@@ -87,23 +50,11 @@ const RendicionCuentaSchema = new Schema({
     required: function () { return this.moneda === 'Dolares'; },
     min: 0
   },
-  subTotal: {
-    type: Number,
-    required: true,
-    min: 0,
-    default: 0
-  },
-  agregarIGV: {
-    type: Boolean,
-    default: false
-  },
   totalRendicion: {
     type: Number,
     required: true,
     min: 0,
-    default: function () {
-      return this.agregarIGV ? this.subTotal * 1.18 : this.subTotal;
-    }
+    default: 0
   },
   registradoPor: {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true }
@@ -118,14 +69,17 @@ const RendicionCuentaSchema = new Schema({
   }
 });
 
-// Middleware para calcular el costoTotal, subTotal y totalRendicion, y actualizar fecha de modificación
-RendicionCuentaSchema.pre('save', function (next) {
+// Middleware para establecer moneda y tipoCambio en cada item de descripcionComprobante
+RendicionCuentaSchema.pre('save', async function(next) {
   this.fechaModificacion = Date.now();
-  this.descripcionComprobante.forEach(item => {
+  const descripcionComprobanteDocs = await mongoose.model('DescripcionComprobante').find({ _id: { $in: this.descripcionComprobante } });
+  descripcionComprobanteDocs.forEach(item => {
+    item.moneda = this.moneda;
+    item.tipoCambio = this.tipoCambio;
     item.costoTotal = item.cantidad * item.precioUnitario;
+    item.save();
   });
-  this.subTotal = this.descripcionComprobante.reduce((acc, item) => acc + item.costoTotal, 0);
-  this.totalRendicion = this.agregarIGV ? this.subTotal * 1.18 : this.subTotal;
+  this.totalRendicion = descripcionComprobanteDocs.reduce((acc, item) => acc + item.costoTotal, 0);
   next();
 });
 

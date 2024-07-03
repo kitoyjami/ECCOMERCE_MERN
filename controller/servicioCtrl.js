@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Servicio = require('../models/servicioModel');
 const Attendance = require('../models/attendanceModel');
+const DescripcionComprobante = require('../models/DescripcionComprobante');
 const User=require('../models/userModel')
 const mongoose = require('mongoose');
 
@@ -58,6 +59,7 @@ const getServicios = asyncHandler(async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
 // @desc    Obtener un servicio por su ID
 // @route   GET /api/servicios/:id
 // @access  Público
@@ -117,6 +119,7 @@ const getServicioById = asyncHandler(async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
 // @desc    Crear un nuevo servicio
 // @route   POST /api/servicios
 // @access  Privado
@@ -209,6 +212,7 @@ const updateServicio = asyncHandler(async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
 // @desc    Eliminar un servicio
 // @route   DELETE /api/servicios/:id
 // @access  Privado
@@ -262,4 +266,47 @@ const actualizarServicios = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { getServicios, getServicioById, createServicio, updateServicio, deleteServicio, actualizarServicios };
+const actualizarServiciosConCamposNuevos = asyncHandler(async (req, res) => {
+  try {
+    const servicios = await Servicio.find();
+
+    const nuevoModelo = new Servicio();
+
+    for (let servicio of servicios) {
+      let isModified = false;
+
+      // Añadir nuevos campos con valores por defecto si no existen
+      if (servicio.totalGastado === undefined) {
+        servicio.totalGastado = 0;
+        isModified = true;
+      }
+
+      // Eliminar campos que ya no existen en el modelo
+      Object.keys(servicio.toObject()).forEach((key) => {
+        if (!(key in nuevoModelo.toObject()) && !['__v', '_id'].includes(key)) {
+          delete servicio[key];
+          isModified = true;
+        }
+      });
+
+      // Añadir nuevos campos del modelo que no existan en los documentos actuales
+      Object.keys(nuevoModelo.toObject()).forEach((key) => {
+        if (!(key in servicio.toObject())) {
+          servicio[key] = nuevoModelo[key];
+          isModified = true;
+        }
+      });
+
+      if (isModified) {
+        await servicio.save();
+      }
+    }
+
+    res.status(200).json({ message: 'Actualización de servicios completada exitosamente.' });
+  } catch (error) {
+    console.error(`Error actualizando los servicios: ${error.message}`);
+    res.status(500).json({ message: 'Error al actualizar los servicios.', error });
+  }
+});
+
+module.exports = { getServicios, getServicioById, createServicio, updateServicio, deleteServicio, actualizarServicios,actualizarServiciosConCamposNuevos };

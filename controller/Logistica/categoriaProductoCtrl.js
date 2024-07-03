@@ -46,7 +46,12 @@ const getCategoriaProducto = asyncHandler(async (req, res) => {
 
 const getAllCategoriasProducto = asyncHandler(async (req, res) => {
     try {
-        const categoriasProducto = await CategoriaProducto.find().populate('tipo');
+        const { tipo } = req.query;
+
+        const query = {};
+        if (tipo) query.tipo = tipo;
+
+        const categoriasProducto = await CategoriaProducto.find(query).populate('tipo');
         res.json(categoriasProducto);
     } catch (error) {
         throw new Error(error);

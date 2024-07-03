@@ -46,7 +46,12 @@ const getSubcategoriaProducto = asyncHandler(async (req, res) => {
 
 const getAllSubcategoriasProducto = asyncHandler(async (req, res) => {
     try {
-        const subcategoriasProducto = await SubcategoriaProducto.find().populate('categoria');
+        const { categoria } = req.query;
+
+        const query = {};
+        if (categoria) query.categoria = categoria;
+
+        const subcategoriasProducto = await SubcategoriaProducto.find(query).populate('categoria');
         res.json(subcategoriasProducto);
     } catch (error) {
         throw new Error(error);

@@ -93,17 +93,19 @@ const servicioSchema = new Schema({
     ref: 'Attendance'
   }],
   registroGastos: [{
-    producto: {
-      type: Schema.Types.ObjectId,
-      ref: 'ProductoCrs',
-      required: true
-    },
-    rendicionCuenta: {
-      type: Schema.Types.ObjectId,
-      ref: 'RendicionCuenta',
-      required: true
-    }
+    type: Schema.Types.ObjectId,
+    ref: 'DescripcionComprobante'
   }],
+  totalGastadoSoles: {
+    type: Number,
+    default: 0,
+    min: [0, 'El total gastado en soles no puede ser negativo']
+  },
+  totalGastadoDolares: {
+    type: Number,
+    default: 0,
+    min: [0, 'El total gastado en dólares no puede ser negativo']
+  },
   totalGastado: {
     type: Number,
     default: 0,
@@ -171,10 +173,16 @@ servicioSchema.pre('save', async function(next) {
     }
   }
 
+  if (this.isModified('registroGastos')) {
+    const descripcionComprobanteDocs = await mongoose.model('DescripcionComprobante').find({ _id: { $in: this.registroGastos } });
+    this.totalGastadoSoles = descripcionComprobanteDocs.filter(doc => doc.moneda === 'Soles').reduce((sum, doc) => sum + doc.costoTotal, 0);
+    this.totalGastadoDolares = descripcionComprobanteDocs.filter(doc => doc.moneda === 'Dolares').reduce((sum, doc) => sum + (doc.costoTotal * doc.tipoCambio), 0);
+    this.totalGastado = this.totalGastadoSoles + this.totalGastadoDolares;
+  }
+
   next();
 });
 
 servicioSchema.index({ nombre: 1 });
 
 module.exports = mongoose.model('Servicio', servicioSchema);
-
