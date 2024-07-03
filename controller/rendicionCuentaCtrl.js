@@ -17,6 +17,11 @@ const createRendicionCuenta = asyncHandler(async (req, res) => {
     tipoCambio,
   } = req.body;
 
+  // Verificar que descripcionComprobante es un arreglo
+  if (!Array.isArray(descripcionComprobante)) {
+    return res.status(400).json({ message: 'descripcionComprobante debe ser un arreglo' });
+  }
+
   const nuevaRendicionCuenta = new RendicionCuenta({
     fecha,
     tipoComprobante,
@@ -35,14 +40,20 @@ const createRendicionCuenta = asyncHandler(async (req, res) => {
 
   // Actualizar el total de gasto en los servicios correspondientes
   for (const desc of descripcionComprobante) {
+    const costoEnSoles = desc.moneda === 'Soles' ? desc.costoTotal : desc.costoTotal * desc.tipoCambio;
     await Servicio.findByIdAndUpdate(desc.servicio, {
-      $inc: { totalGastado: desc.costoTotal },
+      $inc: {
+        totalGastadoSoles: desc.moneda === 'Soles' ? desc.costoTotal : 0,
+        totalGastadoDolares: desc.moneda === 'Dolares' ? desc.costoTotal : 0,
+        totalGastado: costoEnSoles
+      },
       $push: { registroGastos: { producto: desc.producto, rendicionCuenta: rendicionGuardada._id } }
     });
   }
 
   res.status(201).json(rendicionGuardada);
 });
+
 
 // Obtener todas las rendiciones de cuenta
 const getAllRendicionesCuenta = asyncHandler(async (req, res) => {
@@ -115,8 +126,13 @@ const updateRendicionCuenta = asyncHandler(async (req, res) => {
     originalDescripcionComprobante.forEach(async (originalDesc) => {
       const exists = descripcionComprobante.find(desc => desc._id && desc._id.toString() === originalDesc._id.toString());
       if (!exists) {
+        const costoEnSoles = originalDesc.moneda === 'Soles' ? originalDesc.costoTotal : originalDesc.costoTotal * originalDesc.tipoCambio;
         await Servicio.findByIdAndUpdate(originalDesc.servicio, {
-          $inc: { totalGastado: -originalDesc.costoTotal },
+          $inc: {
+            totalGastadoSoles: originalDesc.moneda === 'Soles' ? -originalDesc.costoTotal : 0,
+            totalGastadoDolares: originalDesc.moneda === 'Dolares' ? -originalDesc.costoTotal : 0,
+            totalGastado: -costoEnSoles
+          },
           $pull: { registroGastos: { producto: originalDesc.producto, rendicionCuenta: rendicionCuenta._id } }
         });
       }
@@ -136,8 +152,13 @@ const updateRendicionCuenta = asyncHandler(async (req, res) => {
 
   // Actualizar el total de gasto en los servicios correspondientes
   for (const desc of descripcionComprobante) {
+    const costoEnSoles = desc.moneda === 'Soles' ? desc.costoTotal : desc.costoTotal * desc.tipoCambio;
     await Servicio.findByIdAndUpdate(desc.servicio, {
-      $inc: { totalGastado: desc.costoTotal },
+      $inc: {
+        totalGastadoSoles: desc.moneda === 'Soles' ? desc.costoTotal : 0,
+        totalGastadoDolares: desc.moneda === 'Dolares' ? desc.costoTotal : 0,
+        totalGastado: costoEnSoles
+      },
       $addToSet: { registroGastos: { producto: desc.producto, rendicionCuenta: rendicionActualizada._id } }
     });
   }
@@ -154,8 +175,13 @@ const deleteRendicionCuenta = asyncHandler(async (req, res) => {
 
   // Remover costos de los servicios asociados a los elementos eliminados y eliminar del registro de gastos
   for (const desc of rendicionCuenta.descripcionComprobante) {
+    const costoEnSoles = desc.moneda === 'Soles' ? desc.costoTotal : desc.costoTotal * desc.tipoCambio;
     await Servicio.findByIdAndUpdate(desc.servicio, {
-      $inc: { totalGastado: -desc.costoTotal },
+      $inc: {
+        totalGastadoSoles: desc.moneda === 'Soles' ? -desc.costoTotal : 0,
+        totalGastadoDolares: desc.moneda === 'Dolares' ? -desc.costoTotal : 0,
+        totalGastado: -costoEnSoles
+      },
       $pull: { registroGastos: { producto: desc.producto, rendicionCuenta: rendicionCuenta._id } }
     });
   }
