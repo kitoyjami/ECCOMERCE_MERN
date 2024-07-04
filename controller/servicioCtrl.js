@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Servicio = require('../models/servicioModel');
 const Attendance = require('../models/attendanceModel');
-const DescripcionComprobante = require('../models/DescripcionComprobante');
+//const DescripcionComprobante = require('../models/DescripcionComprobante');
 const User=require('../models/userModel')
 const mongoose = require('mongoose');
 
