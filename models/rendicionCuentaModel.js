@@ -37,11 +37,20 @@ const DescripcionComprobanteSchema = new Schema({
     },
     tipoCambio: {
         type: Number,
-        required: true
+        validate: {
+            validator: function (value) {
+                // El tipo de cambio es requerido si la moneda es Dólares
+                if (this.moneda === 'Dólares') {
+                    return value != null && value > 0;
+                }
+                return true;
+            },
+            message: 'El tipo de cambio es obligatorio y debe ser mayor que 0 cuando la moneda es Dólares'
+        }
     },
-    subtotal:{
-      type:Number,
-      required:true
+    subtotal: {
+        type: Number,
+        required: true
     }
 });
 
@@ -58,21 +67,19 @@ const RendicionCuentaSchema = new Schema({
     nroComprobante: {
         type: String,
         required: true,
-        unique:true
+        unique: true
     },
     foto: {
         public_id: {
             type: String,
-            required: true
         },
         url: {
             type: String,
-            required: true
         }
     },
     estado: {
         type: Boolean,
-        required: true
+        default: true
     },
     proveedor: {
         type: Schema.Types.ObjectId,
@@ -86,15 +93,24 @@ const RendicionCuentaSchema = new Schema({
     },
     tipoCambio: {
         type: Number,
-        required: true
+        validate: {
+            validator: function (value) {
+                // El tipo de cambio es requerido si la moneda es Dólares
+                if (this.moneda === 'Dólares') {
+                    return value != null && value > 0;
+                }
+                return true;
+            },
+            message: 'El tipo de cambio es obligatorio y debe ser mayor que 0 cuando la moneda es Dólares'
+        }
     },
     totalRendicion: {
         type: Number,
         required: true
     },
-    registradoPor:{
-      type: Schema.Types.ObjectId,
-        ref: 'User',  
+    registradoPor: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     }
 });
